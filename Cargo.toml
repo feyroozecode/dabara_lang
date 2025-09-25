@@ -1,0 +1,9 @@
+[package]
+name = "dabara"
+version = "0.0.1"
+edition = "2021"
+authors = ["Ahmad"]
+description = "Dabara Programming Language - Hausa syntax for everyone"
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
