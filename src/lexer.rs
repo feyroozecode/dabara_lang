@@ -35,6 +35,7 @@ impl Token {
     /// Convertit un mot en token si c'est un mot-clé
     fn from_keyword(word: &str) -> Option<Token> {
         match word {
+            // Versions originales avec caractères haoussa
             "fara" => Some(Token::Begin),
             "ƙare" => Some(Token::End),
             "rubuta" => Some(Token::Print),
@@ -43,6 +44,12 @@ impl Token {
             "karya" => Some(Token::False),
             "ƙara" => Some(Token::Plus),
             "rage" => Some(Token::Minus),
+            
+            // Versions alternatives avec caractères latins
+            "kare" => Some(Token::End),      // Alternative pour ƙare
+            "nada" => Some(Token::Let),      // Alternative pour naɗa  
+            "kara" => Some(Token::Plus),     // Alternative pour ƙara
+            
             _ => None,
         }
     }

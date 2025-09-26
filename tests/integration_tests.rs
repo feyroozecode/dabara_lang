@@ -37,6 +37,19 @@ fara
     }
 
     #[test]
+    fn test_latin_variables() {
+        let program = r#"
+fara
+  nada sunan = "Ahmad"
+  nada lambar = 42
+  rubuta sunan
+  rubuta lambar
+kare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
     fn test_arithmetic() {
         let program = r#"
 fara
@@ -50,8 +63,40 @@ fara
     }
 
     #[test]
+    fn test_latin_arithmetic() {
+        let program = r#"
+fara
+  nada a = 5
+  nada b = 3
+  nada sakamako = a kara b
+  rubuta sakamako
+kare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
     fn test_tokenizer_keywords() {
         let tokens = tokenize("fara naɗa rubuta ƙare gaskiya karya ƙara rage").unwrap();
+        
+        let expected = vec![
+            Token::Begin,
+            Token::Let,
+            Token::Print,
+            Token::End,
+            Token::True,
+            Token::False,
+            Token::Plus,
+            Token::Minus,
+            Token::Eof,
+        ];
+        
+        assert_eq!(tokens, expected);
+    }
+
+    #[test]
+    fn test_tokenizer_latin_keywords() {
+        let tokens = tokenize("fara nada rubuta kare gaskiya karya kara rage").unwrap();
         
         let expected = vec![
             Token::Begin,

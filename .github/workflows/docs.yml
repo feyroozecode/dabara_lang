@@ -1,0 +1,97 @@
+name: Build Documentation
+
+on:
+  push:
+    branches: [ main, master ]
+    paths: 
+      - 'docs/**'
+      - 'ebook/**'
+  workflow_dispatch:
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install mdBook
+      run: |
+        curl -L https://github.com/rust-lang/mdBook/releases/latest/download/mdbook-v0.4.52-x86_64-unknown-linux-gnu.tar.gz | tar xz
+        chmod +x mdbook
+        sudo mv mdbook /usr/local/bin/
+
+    - name: Build Documentation
+      run: |
+        cd docs
+        mdbook build
+
+    - name: Build eBook
+      run: |
+        cd ebook
+        mdbook build
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/book
+        destination_dir: docs
+
+    - name: Deploy eBook to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./ebook/book
+        destination_dir: ebook
+
+    - name: Upload Documentation Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: |
+          docs/book/**
+          ebook/book/**
+
+  build-epub:
+    runs-on: ubuntu-latest
+    needs: build-docs
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pandoc calibre
+
+    - name: Install Rust and mdBook
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        source ~/.cargo/env
+        cargo install mdbook
+
+    - name: Build EPUB
+      run: |
+        cd ebook
+        # Générer le HTML d'abord
+        mdbook build
+        
+        # Créer le fichier EPUB avec pandoc
+        pandoc -f html -t epub3 \
+          --epub-metadata=metadata.xml \
+          --epub-cover-image=cover.png \
+          --toc-depth=3 \
+          --output=dabara-guide-complet.epub \
+          book/index.html book/**/*.html
+
+    - name: Upload EPUB
+      uses: actions/upload-artifact@v4
+      with:
+        name: ebook-epub
+        path: ebook/dabara-guide-complet.epub
