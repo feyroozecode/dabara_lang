@@ -5,9 +5,17 @@
 
 use std::collections::HashMap;
 use std::fmt;
+use std::io::{self, Write};
 
 use crate::parser::{Program, Statement, Expression, BinaryOperator};
 use crate::error::Error;
+
+/// Représente une fonction définie par l'utilisateur
+#[derive(Debug, Clone)]
+pub struct Function {
+    pub parameters: Vec<String>,
+    pub body: Vec<Statement>,
+}
 
 /// Types de valeurs dans Dabara
 #[derive(Debug, Clone)]
@@ -50,6 +58,8 @@ impl fmt::Display for Value {
 pub struct Interpreter {
     /// Environnement des variables
     variables: HashMap<String, Value>,
+    /// Fonctions définies par l'utilisateur
+    functions: HashMap<String, Function>,
 }
 
 impl Interpreter {
@@ -57,6 +67,7 @@ impl Interpreter {
     pub fn new() -> Self {
         Interpreter {
             variables: HashMap::new(),
+            functions: HashMap::new(),
         }
     }
     
@@ -82,11 +93,17 @@ impl Interpreter {
                 println!("{}", value);
                 Ok(())
             }
+            
+            Statement::FunctionDef { name, parameters, body } => {
+                let function = Function { parameters, body };
+                self.functions.insert(name, function);
+                Ok(())
+            }
         }
     }
     
     /// Évalue une expression
-    fn evaluate_expression(&self, expression: Expression) -> Result<Value, Error> {
+    fn evaluate_expression(&mut self, expression: Expression) -> Result<Value, Error> {
         match expression {
             Expression::Number(n) => Ok(Value::Number(n)),
             
@@ -105,6 +122,14 @@ impl Interpreter {
                 let right_val = self.evaluate_expression(*right)?;
                 
                 self.evaluate_binary_operation(left_val, operator, right_val)
+            }
+            
+            Expression::FunctionCall { name, arguments } => {
+                self.call_function(name, arguments)
+            }
+            
+            Expression::Input => {
+                self.get_user_input()
             }
         }
     }
@@ -125,6 +150,20 @@ impl Interpreter {
             // Soustraction de nombres
             (Value::Number(a), BinaryOperator::Subtract, Value::Number(b)) => {
                 Ok(Value::Number(a - b))
+            }
+            
+            // Multiplication de nombres
+            (Value::Number(a), BinaryOperator::Multiply, Value::Number(b)) => {
+                Ok(Value::Number(a * b))
+            }
+            
+            // Division de nombres
+            (Value::Number(a), BinaryOperator::Divide, Value::Number(b)) => {
+                if b == 0 {
+                    Err(Error::runtime_error("Ba za a iya raba da sifili ba (Division par zéro)"))
+                } else {
+                    Ok(Value::Number(a / b))
+                }
             }
             
             // Concaténation de chaînes avec +
@@ -163,6 +202,8 @@ impl Interpreter {
                 let op_name = match op {
                     BinaryOperator::Add => "ƙara",
                     BinaryOperator::Subtract => "rage",
+                    BinaryOperator::Multiply => "ninka",
+                    BinaryOperator::Divide => "raba",
                     BinaryOperator::Concat => "+",
                 };
                 
@@ -188,5 +229,33 @@ impl Interpreter {
     /// Efface toutes les variables
     pub fn clear_variables(&mut self) {
         self.variables.clear();
+    }
+    
+    /// Appelle une fonction définie par l'utilisateur
+    fn call_function(&mut self, name: String, _arguments: Vec<Expression>) -> Result<Value, Error> {
+        // TODO: Implémenter l'appel de fonction avec un environnement local
+        // Pour l'instant, retourner une erreur
+        Err(Error::runtime_error(&format!("Fonction '{}' ba ta da aiki ba tukuna (pas encore implémentée)", name)))
+    }
+    
+    /// Récupère l'entrée utilisateur
+    fn get_user_input(&mut self) -> Result<Value, Error> {
+        print!("Rubuta abu: "); // "Écris quelque chose: "
+        io::stdout().flush().unwrap();
+        
+        let mut input = String::new();
+        match io::stdin().read_line(&mut input) {
+            Ok(_) => {
+                let trimmed = input.trim();
+                
+                // Essayer de parser comme nombre d'abord
+                if let Ok(num) = trimmed.parse::<i64>() {
+                    Ok(Value::Number(num))
+                } else {
+                    Ok(Value::String(trimmed.to_string()))
+                }
+            }
+            Err(_) => Err(Error::runtime_error("Ba za a iya karba shigarwa ba (Impossible de lire l'entrée)"))
+        }
     }
 }

@@ -17,6 +17,17 @@ pub enum Token {
     False,      // karya
     Plus,       // ƙara
     Minus,      // rage
+    Multiply,   // ninka
+    Divide,     // raba
+    Function,   // aiki
+    Input,      // karɓa
+    
+    // Délimiteurs pour fonctions
+    LeftParen,  // (
+    RightParen, // )
+    LeftBrace,  // {
+    RightBrace, // }
+    Comma,      // ,
     
     // Littéraux
     Identifier(String),
@@ -44,6 +55,10 @@ impl Token {
             "karya" => Some(Token::False),
             "ƙara" => Some(Token::Plus),
             "rage" => Some(Token::Minus),
+            "ninka" => Some(Token::Multiply),
+            "raba" => Some(Token::Divide),
+            "aiki" => Some(Token::Function),
+            "karɓa" => Some(Token::Input),
             
             // Versions alternatives avec caractères latins
             "kare" => Some(Token::End),      // Alternative pour ƙare
@@ -89,6 +104,16 @@ impl Lexer {
             } else {
                 break;
             }
+        }
+    }
+    
+    /// Ignore les commentaires (lignes commençant par #)
+    fn skip_comment(&mut self) {
+        while let Some(ch) = self.current_char {
+            if ch == '\n' {
+                break;
+            }
+            self.advance();
         }
     }
     
@@ -169,9 +194,44 @@ impl Lexer {
                     return Ok(Token::Equals);
                 }
                 
-                Some('+') => {
+                Some('*') => {
                     self.advance();
-                    return Ok(Token::Plus);
+                    return Ok(Token::Multiply);
+                }
+                
+                Some('/') => {
+                    self.advance();
+                    return Ok(Token::Divide);
+                }
+                
+                Some('#') => {
+                    self.skip_comment();
+                    continue; // Ignorer et continuer
+                }
+                
+                Some('(') => {
+                    self.advance();
+                    return Ok(Token::LeftParen);
+                }
+                
+                Some(')') => {
+                    self.advance();
+                    return Ok(Token::RightParen);
+                }
+                
+                Some('{') => {
+                    self.advance();
+                    return Ok(Token::LeftBrace);
+                }
+                
+                Some('}') => {
+                    self.advance();
+                    return Ok(Token::RightBrace);
+                }
+                
+                Some(',') => {
+                    self.advance();
+                    return Ok(Token::Comma);
                 }
                 
                 Some('"') => {

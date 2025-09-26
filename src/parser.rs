@@ -19,6 +19,12 @@ pub enum Statement {
     Let { name: String, value: Expression },
     /// Instruction d'affichage: rubuta expression
     Print(Expression),
+    /// Définition de fonction: aiki nom(paramètres) { corps }
+    FunctionDef {
+        name: String,
+        parameters: Vec<String>,
+        body: Vec<Statement>,
+    },
 }
 
 /// Types d'expressions dans Dabara
@@ -38,6 +44,13 @@ pub enum Expression {
         operator: BinaryOperator,
         right: Box<Expression>,
     },
+    /// Appel de fonction
+    FunctionCall {
+        name: String,
+        arguments: Vec<Expression>,
+    },
+    /// Entrée utilisateur
+    Input,
 }
 
 /// Opérateurs binaires supportés
@@ -47,6 +60,10 @@ pub enum BinaryOperator {
     Add,
     /// Soustraction (rage)
     Subtract,
+    /// Multiplication (ninka)
+    Multiply,
+    /// Division (raba)
+    Divide,
     /// Concaténation (+)
     Concat,
 }
@@ -147,6 +164,7 @@ impl Parser {
         match &self.current_token {
             Token::Let => self.parse_let_statement(),
             Token::Print => self.parse_print_statement(),
+            Token::Function => self.parse_function_definition(),
             _ => Err(Error::expected_statement()),
         }
     }
@@ -180,14 +198,76 @@ impl Parser {
         Ok(Statement::Print(expression))
     }
     
+    /// Parse une définition de fonction: aiki nom(paramètres) { corps }
+    fn parse_function_definition(&mut self) -> Result<Statement, Error> {
+        self.advance()?; // Consommer 'aiki'
+        
+        let name = match &self.current_token {
+            Token::Identifier(name) => {
+                let func_name = name.clone();
+                self.advance()?;
+                func_name
+            }
+            _ => return Err(Error::unexpected_token("identifier", &format!("{:?}", self.current_token))),
+        };
+        
+        self.expect_token(Token::LeftParen)?;
+        
+        let mut parameters = Vec::new();
+        
+        // Parse les paramètres
+        while self.current_token != Token::RightParen {
+            if let Token::Identifier(param) = &self.current_token {
+                parameters.push(param.clone());
+                self.advance()?;
+                
+                if self.current_token == Token::Comma {
+                    self.advance()?;
+                }
+            } else {
+                return Err(Error::unexpected_token("parameter", &format!("{:?}", self.current_token)));
+            }
+        }
+        
+        self.expect_token(Token::RightParen)?;
+        self.expect_token(Token::LeftBrace)?;
+        
+        // Skip les newlines après {
+        while self.current_token == Token::Newline {
+            self.advance()?;
+        }
+        
+        let mut body = Vec::new();
+        
+        // Parse le corps de la fonction
+        while self.current_token != Token::RightBrace && self.current_token != Token::Eof {
+            if self.current_token == Token::Newline {
+                self.advance()?;
+                continue;
+            }
+            
+            let statement = self.parse_statement()?;
+            body.push(statement);
+            
+            // Skip les newlines après le statement
+            while self.current_token == Token::Newline {
+                self.advance()?;
+            }
+        }
+        
+        self.expect_token(Token::RightBrace)?;
+        
+        Ok(Statement::FunctionDef { name, parameters, body })
+    }
+    
     /// Parse une expression
     fn parse_expression(&mut self) -> Result<Expression, Error> {
         self.parse_additive_expression()
     }
     
-    /// Parse une expression additive (gère + et -)
+    /// Parse une expression additive (gère +, -, *, /)
     fn parse_additive_expression(&mut self) -> Result<Expression, Error> {
-        let mut left = self.parse_primary_expression()?;
+        let mut left = self.parse_multiplicative_expression()?;
         
         while matches!(self.current_token, Token::Plus | Token::Minus) {
             let operator = match self.current_token {
@@ -204,6 +284,35 @@ impl Parser {
                 _ => unreachable!(),
             };
             
+            let right = self.parse_multiplicative_expression()?;
+            
+            left = Expression::BinaryOp {
+                left: Box::new(left),
+                operator,
+                right: Box::new(right),
+            };
+        }
+        
+        Ok(left)
+    }
+    
+    /// Parse une expression multiplicative (gère * et /)
+    fn parse_multiplicative_expression(&mut self) -> Result<Expression, Error> {
+        let mut left = self.parse_primary_expression()?;
+        
+        while matches!(self.current_token, Token::Multiply | Token::Divide) {
+            let operator = match self.current_token {
+                Token::Multiply => {
+                    self.advance()?;
+                    BinaryOperator::Multiply
+                }
+                Token::Divide => {
+                    self.advance()?;
+                    BinaryOperator::Divide
+                }
+                _ => unreachable!(),
+            };
+            
             let right = self.parse_primary_expression()?;
             
             left = Expression::BinaryOp {
@@ -216,7 +325,7 @@ impl Parser {
         Ok(left)
     }
     
-    /// Parse une expression primaire (littéraux, identificateurs)
+    /// Parse une expression primaire (littéraux, identificateurs, appels de fonction)
     fn parse_primary_expression(&mut self) -> Result<Expression, Error> {
         match &self.current_token.clone() {
             Token::Number(n) => {
@@ -241,10 +350,40 @@ impl Parser {
                 Ok(Expression::Boolean(false))
             }
             
+            Token::Input => {
+                self.advance()?;
+                Ok(Expression::Input)
+            }
+            
             Token::Identifier(name) => {
                 let var_name = name.clone();
                 self.advance()?;
-                Ok(Expression::Identifier(var_name))
+                
+                // Vérifier s'il s'agit d'un appel de fonction
+                if self.current_token == Token::LeftParen {
+                    self.advance()?; // Consommer '('
+                    
+                    let mut arguments = Vec::new();
+                    
+                    // Parse les arguments
+                    while self.current_token != Token::RightParen {
+                        let arg = self.parse_expression()?;
+                        arguments.push(arg);
+                        
+                        if self.current_token == Token::Comma {
+                            self.advance()?;
+                        }
+                    }
+                    
+                    self.expect_token(Token::RightParen)?;
+                    
+                    Ok(Expression::FunctionCall {
+                        name: var_name,
+                        arguments,
+                    })
+                } else {
+                    Ok(Expression::Identifier(var_name))
+                }
             }
             
             _ => Err(Error::expected_expression()),
@@ -254,6 +393,6 @@ impl Parser {
 
 /// Fonction utilitaire pour parser des tokens
 pub fn parse(tokens: Vec<Token>) -> Result<Program, Error> {
-    let mut parser = Parser::new(tokens)?;
+    let mut parser = Parser::new(tokens)?; 
     parser.parse_program()
-}
+}      

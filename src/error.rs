@@ -67,4 +67,8 @@ impl Error {
     pub fn expected_expression() -> Self {
         Error::ParseError("Ana tsammanin expression".to_string())
     }
+    
+    pub fn runtime_error(message: &str) -> Self {
+        Error::RuntimeError(message.to_string())
+    }
 }
