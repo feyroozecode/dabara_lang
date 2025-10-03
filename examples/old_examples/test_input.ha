@@ -1,7 +1,7 @@
 # Test simple pour lentrée utilisateur
 
 fara
-    rubuta "Rubuta lamba: "
+    rubuta "Rubuta lamba 1 : "
     naɗa lamba = karɓa
     
     rubuta "Ka rubuta lambar biyu: "
@@ -21,3 +21,4 @@ fara
     rubuta "Raba: "
     rubuta raba_sakamako
 ƙare
+

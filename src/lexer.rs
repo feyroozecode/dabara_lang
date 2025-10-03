@@ -22,11 +22,29 @@ pub enum Token {
     Function,   // aiki
     Input,      // karɓa
     
-    // Délimiteurs pour fonctions
+    // Conditions en hausa naturel
+    If,         // idan
+    Else,       // amma
+    ElseIf,     // ammaina
+    
+    // Comparaisons
+    Equal,      // == (daidai)
+    NotEqual,   // != (ba daidai ba)
+    Less,       // < (ƙasa)
+    Greater,    // > (sama)
+    LessEqual,  // <= (ƙasa ko daidai)
+    GreaterEqual, // >= (sama ko daidai)
+    
+    // Méthodes inspirées de Ruby (en haoussa)
+    Dot,        // . (pour appel de méthode)
+    
+    // Délimiteurs pour fonctions et listes
     LeftParen,  // (
     RightParen, // )
     LeftBrace,  // {
     RightBrace, // }
+    LeftBracket, // [ (pour listes)
+    RightBracket, // ] (pour listes)
     Comma,      // ,
     
     // Littéraux
@@ -60,6 +78,11 @@ impl Token {
             "aiki" => Some(Token::Function),
             "karɓa" => Some(Token::Input),
             
+            // Conditions en hausa naturel
+            "idan" => Some(Token::If),
+            "amma" => Some(Token::Else),
+            "ammaina" => Some(Token::ElseIf),
+            
             // Versions alternatives avec caractères latins
             "kare" => Some(Token::End),      // Alternative pour ƙare
             "nada" => Some(Token::Let),      // Alternative pour naɗa  
@@ -74,7 +97,7 @@ impl Token {
 pub struct Lexer {
     input: Vec<char>,
     position: usize,
-    current_char: Option<char>,
+    current_char: Option<char>,  
 }
 
 impl Lexer {
@@ -94,6 +117,11 @@ impl Lexer {
     fn advance(&mut self) {
         self.position += 1;
         self.current_char = self.input.get(self.position).copied();
+    }
+    
+    /// Regarde le caractère suivant sans avancer
+    fn peek(&self) -> Option<char> {
+        self.input.get(self.position + 1).copied()
     }
     
     /// Ignore les espaces (mais pas les newlines)
@@ -118,7 +146,7 @@ impl Lexer {
     }
     
     /// Lit un nombre
-    fn read_number(&mut self) -> i64 {
+    fn read_number(&mut self) -> i64 {  
         let mut number_str = String::new();
         
         while let Some(ch) = self.current_char {
@@ -189,9 +217,25 @@ impl Lexer {
                     return Ok(Token::Newline);
                 }
                 
+                Some('=') if self.peek() == Some('=') => {
+                    self.advance(); // Consommer le premier '='
+                    self.advance(); // Consommer le second '='
+                    return Ok(Token::Equal);
+                }
+                
                 Some('=') => {
                     self.advance();
                     return Ok(Token::Equals);
+                }
+                
+                Some('+') => {
+                    self.advance();
+                    return Ok(Token::Plus);
+                }
+                
+                Some('-') => {
+                    self.advance();
+                    return Ok(Token::Minus);
                 }
                 
                 Some('*') => {
@@ -232,6 +276,44 @@ impl Lexer {
                 Some(',') => {
                     self.advance();
                     return Ok(Token::Comma);
+                }
+                
+                Some('[') => {
+                    self.advance();
+                    return Ok(Token::LeftBracket);
+                }
+                
+                Some(']') => {
+                    self.advance();
+                    return Ok(Token::RightBracket);
+                }
+                
+                Some('!') if self.peek() == Some('=') => {
+                    self.advance(); // Consommer '!'
+                    self.advance(); // Consommer '='
+                    return Ok(Token::NotEqual);
+                }
+                
+                Some('<') if self.peek() == Some('=') => {
+                    self.advance(); // Consommer '<'
+                    self.advance(); // Consommer '='
+                    return Ok(Token::LessEqual);
+                }
+                
+                Some('<') => {
+                    self.advance();
+                    return Ok(Token::Less);
+                }
+                
+                Some('>') if self.peek() == Some('=') => {
+                    self.advance(); // Consommer '>'
+                    self.advance(); // Consommer '='
+                    return Ok(Token::GreaterEqual);
+                }
+                
+                Some('>') => {
+                    self.advance();
+                    return Ok(Token::Greater);
                 }
                 
                 Some('"') => {

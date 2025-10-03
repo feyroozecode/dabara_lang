@@ -15,7 +15,7 @@ pub struct Program {
 /// Types de statements dans Dabara
 #[derive(Debug, Clone)]
 pub enum Statement {
-    /// Déclaration de variable: naɗa nom = expression
+    /// Déclaration de variable: naɗa nom = expression    
     Let { name: String, value: Expression },
     /// Instruction d'affichage: rubuta expression
     Print(Expression),
@@ -25,6 +25,14 @@ pub enum Statement {
         parameters: Vec<String>,
         body: Vec<Statement>,
     },
+    /// Condition if/else/elseif: idan condition { ... } amma { ... }
+    If {
+        condition: Expression,
+        then_branch: Vec<Statement>,
+        else_branch: Option<Box<Statement>>,
+    },
+    /// Statement d'expression (comme appel de fonction standalone)
+    Expression(Expression),
 }
 
 /// Types d'expressions dans Dabara
@@ -38,15 +46,23 @@ pub enum Expression {
     String(String),
     /// Valeur booléenne
     Boolean(bool),
+    /// Liste de valeurs: [element1, element2, ...]
+    List(Vec<Expression>),
     /// Opération binaire
-    BinaryOp {
+    BinaryOp {                                   
         left: Box<Expression>,
         operator: BinaryOperator,
         right: Box<Expression>,
     },
-    /// Appel de fonction
+    /// Appel de fonction   /// e.g => ayki gaydaMutane (["Musa", "Issa"])
     FunctionCall {
         name: String,
+        arguments: Vec<Expression>,
+    },
+    /// Appel de mètode (style Ruby en haoussa)  /// e.g => yin mutane("Musa")
+    MethodCall {
+        receiver: Box<Expression>,
+        method: String,
         arguments: Vec<Expression>,
     },
     /// Entrée utilisateur
@@ -66,12 +82,24 @@ pub enum BinaryOperator {
     Divide,
     /// Concaténation (+)
     Concat,
+    /// Égalité (==)
+    Equal,
+    /// Inégalité (!=)
+    NotEqual,
+    /// Inférieur (<)
+    Less,
+    /// Supérieur (>)
+    Greater,
+    /// Inférieur ou égal (<=)
+    LessEqual,
+    /// Supérieur ou égal (>=)
+    GreaterEqual,
 }
 
 /// Parser pour construire l'AST
 pub struct Parser {
     tokens: Vec<Token>,
-    position: usize,
+    position: usize,  
     current_token: Token,
 }
 
@@ -120,6 +148,45 @@ impl Parser {
         }
     }
     
+    /// Vérifie si c'est un appel de fonction sans parenthèses
+    /// (le token suivant est un argument potentiel)
+    fn is_function_call_without_parens(&self) -> bool {
+        matches!(self.current_token, 
+            Token::Number(_) | 
+            Token::String(_) | 
+            Token::Identifier(_) | 
+            Token::True | 
+            Token::False | 
+            Token::Input |
+            Token::LeftBracket
+        )
+    }
+    
+    /// Vérifie si on est à la fin d'une expression
+    fn is_end_of_expression(&self) -> bool {
+        matches!(self.current_token,
+            Token::Newline |
+            Token::Eof |
+            Token::RightParen |
+            Token::RightBrace |
+            Token::RightBracket |
+            Token::End |
+            Token::Plus |
+            Token::Minus |
+            Token::Multiply |
+            Token::Divide |
+            Token::Dot |
+            Token::Equal |
+            Token::NotEqual |
+            Token::Less |
+            Token::Greater |
+            Token::LessEqual |
+            Token::GreaterEqual |
+            Token::Else |
+            Token::ElseIf
+        )
+    }
+    
     /// Parse un programme complet
     pub fn parse_program(&mut self) -> Result<Program, Error> {
         // Skip les newlines au début
@@ -165,6 +232,12 @@ impl Parser {
             Token::Let => self.parse_let_statement(),
             Token::Print => self.parse_print_statement(),
             Token::Function => self.parse_function_definition(),
+            Token::If => self.parse_if_statement(),
+            // Si c'est un identificateur, cela peut être un appel de fonction
+            Token::Identifier(_) => {
+                let expression = self.parse_expression()?;
+                Ok(Statement::Expression(expression))
+            }
             _ => Err(Error::expected_statement()),
         }
     }
@@ -260,9 +333,138 @@ impl Parser {
         Ok(Statement::FunctionDef { name, parameters, body })
     }
     
+    /// Parse une condition if/else/elseif: idan condition { ... } amma { ... }
+    fn parse_if_statement(&mut self) -> Result<Statement, Error> {
+        self.advance()?; // Consommer 'idan'
+        
+        let condition = self.parse_expression()?;
+        
+        self.expect_token(Token::LeftBrace)?;
+        
+        // Skip les newlines après {
+        while self.current_token == Token::Newline {
+            self.advance()?;
+        }
+        
+        let mut then_branch = Vec::new();
+        
+        // Parse le corps du if
+        while self.current_token != Token::RightBrace && self.current_token != Token::Eof {
+            if self.current_token == Token::Newline {
+                self.advance()?;
+                continue;
+            }
+            
+            let statement = self.parse_statement()?;
+            then_branch.push(statement);
+            
+            // Skip les newlines après le statement
+            while self.current_token == Token::Newline {
+                self.advance()?;
+            }
+        }
+        
+        self.expect_token(Token::RightBrace)?;
+        
+        // Vérifier s'il y a une clause else ou elseif
+        let else_branch = if self.current_token == Token::Else {
+            self.advance()?; // Consommer 'amma'
+            
+            self.expect_token(Token::LeftBrace)?;
+            
+            // Skip les newlines après {
+            while self.current_token == Token::Newline {
+                self.advance()?;
+            }
+            
+            let mut else_statements = Vec::new();
+            
+            // Parse le corps du else
+            while self.current_token != Token::RightBrace && self.current_token != Token::Eof {
+                if self.current_token == Token::Newline {
+                    self.advance()?;
+                    continue;
+                }
+                
+                let statement = self.parse_statement()?;
+                else_statements.push(statement);
+                
+                // Skip les newlines après le statement
+                while self.current_token == Token::Newline {
+                    self.advance()?;
+                }
+            }
+            
+            self.expect_token(Token::RightBrace)?;
+            
+            // Créer un statement fictif pour else
+            Some(Box::new(Statement::Expression(Expression::Boolean(true))))
+        } else if self.current_token == Token::ElseIf {
+            // Parse elseif comme un if imbriqué
+            let elseif_statement = self.parse_if_statement()?;
+            Some(Box::new(elseif_statement))
+        } else {
+            None
+        };
+        
+        Ok(Statement::If {
+            condition,
+            then_branch,
+            else_branch,
+        })
+    }
+    
     /// Parse une expression
     fn parse_expression(&mut self) -> Result<Expression, Error> {
-        self.parse_additive_expression()
+        self.parse_comparison_expression()
+    }
+    
+    /// Parse une expression de comparaison (==, !=, <, >, <=, >=)
+    fn parse_comparison_expression(&mut self) -> Result<Expression, Error> {
+        let mut left = self.parse_additive_expression()?;
+        
+        while matches!(self.current_token, 
+            Token::Equal | Token::NotEqual | Token::Less | 
+            Token::Greater | Token::LessEqual | Token::GreaterEqual
+        ) {
+            let operator = match self.current_token {
+                Token::Equal => {
+                    self.advance()?;
+                    BinaryOperator::Equal
+                }
+                Token::NotEqual => {
+                    self.advance()?;
+                    BinaryOperator::NotEqual
+                }
+                Token::Less => {
+                    self.advance()?;
+                    BinaryOperator::Less
+                }
+                Token::Greater => {
+                    self.advance()?;
+                    BinaryOperator::Greater
+                }
+                Token::LessEqual => {
+                    self.advance()?;
+                    BinaryOperator::LessEqual
+                }
+                Token::GreaterEqual => {
+                    self.advance()?;
+                    BinaryOperator::GreaterEqual
+                }
+                _ => unreachable!(),
+            };
+            
+            let right = self.parse_additive_expression()?;
+            
+            left = Expression::BinaryOp {
+                left: Box::new(left),
+                operator,
+                right: Box::new(right),
+            };
+        }
+        
+        Ok(left)
     }
     
     /// Parse une expression additive (gère +, -, *, /)
@@ -355,11 +557,16 @@ impl Parser {
                 Ok(Expression::Input)
             }
             
+            Token::LeftBracket => {
+                self.parse_list_expression()
+            }
+            
             Token::Identifier(name) => {
                 let var_name = name.clone();
                 self.advance()?;
                 
                 // Vérifier s'il s'agit d'un appel de fonction
+                // Syntaxe avec parenthèses : fonction(arg1, arg2)
                 if self.current_token == Token::LeftParen {
                     self.advance()?; // Consommer '('
                     
@@ -367,7 +574,7 @@ impl Parser {
                     
                     // Parse les arguments
                     while self.current_token != Token::RightParen {
-                        let arg = self.parse_expression()?;
+                        let arg = self.parse_comparison_expression()?;
                         arguments.push(arg);
                         
                         if self.current_token == Token::Comma {
@@ -381,6 +588,26 @@ impl Parser {
                         name: var_name,
                         arguments,
                     })
+                }
+                // Syntaxe sans parenthèses : fonction arg1 arg2 (style Ruby/Python)
+                else if self.is_function_call_without_parens() {
+                    let mut arguments = Vec::new();
+                    
+                    // Parse les arguments jusqu'à un délimiteur ou fin de ligne
+                    while !self.is_end_of_expression() {
+                        let arg = self.parse_primary_expression()?;
+                        arguments.push(arg);
+                        
+                        // Les arguments sont séparés par des espaces ou virgules
+                        if self.current_token == Token::Comma {
+                            self.advance()?;
+                        }
+                    }
+                    
+                    Ok(Expression::FunctionCall {
+                        name: var_name,
+                        arguments,
+                    })
                 } else {
                     Ok(Expression::Identifier(var_name))
                 }
@@ -389,10 +616,36 @@ impl Parser {
             _ => Err(Error::expected_expression()),
         }
     }
+    
+    /// Parse une liste: [element1, element2, ...]
+    fn parse_list_expression(&mut self) -> Result<Expression, Error> {
+        self.advance()?; // Consommer '['
+        
+        let mut elements = Vec::new();
+        
+        // Parse les éléments de la liste
+        while self.current_token != Token::RightBracket && self.current_token != Token::Eof {
+            let element = self.parse_expression()?;
+            elements.push(element);
+            
+            if self.current_token == Token::Comma {
+                self.advance()?;
+            } else if self.current_token != Token::RightBracket {
+                return Err(Error::unexpected_token(
+                    ", ou ]", 
+                    &format!("{:?}", self.current_token)
+                ));
+            }
+        }
+        
+        self.expect_token(Token::RightBracket)?;
+        
+        Ok(Expression::List(elements))
+    }
 }
 
 /// Fonction utilitaire pour parser des tokens
 pub fn parse(tokens: Vec<Token>) -> Result<Program, Error> {
     let mut parser = Parser::new(tokens)?; 
     parser.parse_program()
-}      
+}

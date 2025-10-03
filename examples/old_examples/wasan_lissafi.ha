@@ -5,7 +5,7 @@ fara
     rubuta "=== Sannu da zuwa wasan lissafi! ==="
     rubuta "Zan ba ka tambayoyin lissafi, ka amsa su!"
     
-    // Jeu 1: Addition simple
+    # Jeu 1: Addition simple
     rubuta "\n--- Tambaya ta farko: Ƙara ---"
     naɗa lamba1 = 15
     naɗa lamba2 = 27
@@ -16,11 +16,11 @@ fara
     rubuta "Rubuta amsarka: "
     naɗa amsa_mai_amfani = karɓa
     
-    // Vérification (simulation)
+    # Vérification (simulation)
     rubuta "Amsa daidai: "
     rubuta amsa_daidai
     
-    // Jeu 2: Multiplication 
+    # Jeu 2: Multiplication 
     rubuta "\n--- Tambaya ta biyu: Ninka ---"
     naɗa lamba3 = 8
     naɗa lamba4 = 7
@@ -34,7 +34,7 @@ fara
     rubuta "Amsa daidai: "
     rubuta amsa_ninka
     
-    // Jeu 3: Division
+    # Jeu 3: Division
     rubuta "\n--- Tambaya ta uku: Raba ---"
     naɗa lamba5 = 56
     naɗa lamba6 = 8
@@ -48,12 +48,12 @@ fara
     rubuta "Amsa daidai: "
     rubuta amsa_raba
     
-    // Calcul du score (simulation)
+    # Calcul du score (simulation)
     rubuta "\n=== Ƙarshen wasa ==="
     rubuta "Na gode da wasa!"
     rubuta "Sake wasa kuma ka koyi!"
     
-    // Message d'encouragement en Hausa
+    # Message dencouragement en Hausa
     rubuta "Lissafi yana da muhimmanci a rayuwa!"
     rubuta "Ci gaba da nazari!"
 ƙare

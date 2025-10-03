@@ -1,0 +1,35 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches: [ main, master ]
+    paths: [ 'docs/**' ]
+  pull_request:
+    branches: [ main, master ]
+    paths: [ 'docs/**' ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup mdBook
+      uses: peaceiris/actions-mdbook@v1
+      with:
+        mdbook-version: '0.4.36'
+    
+    - name: Build documentation
+      run: |
+        cd docs
+        mdbook build
+    
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/book
+        cname: dabara-docs.github.io  # Remplacez par votre domaine personnalisé si vous en avez un

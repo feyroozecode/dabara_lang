@@ -1,4 +1,4 @@
-# Nouvelles Fonctionnalités de Dabara v0.2
+# Nouvelles Fonctionnalités de Dabara v0.1.1
 
 ## Aperçu des améliorations
 

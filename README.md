@@ -1,4 +1,4 @@
-# Dabara Programming Language v0.0.1
+# Dabara Programming Language v0.1.1
 
 **Dabara** (_prononcé dah-BAH-rah_) est un langage de programmation utilisant des mots-clés en haoussa, conçu pour démocratiser l'accès à la programmation pour les communautés Hausa.
 
@@ -158,6 +158,40 @@ fara
 ƙare
 ```
 
+## 🎦 Exemples organisés / Misalai da aka shirya
+
+Nous avons organisé des exemples par catégories pour faciliter l'apprentissage :
+
+### ✅ Exemples fonctionnels (testez-les !)
+
+```bash
+# 1. Bases du langage
+cargo run examples/test_001_variables_et_affichage.ha  # Variables et affichage
+cargo run examples/test_001b_listes.ha                # Listes [1,2,3]
+cargo run examples/test_001c_arithmetique.ha           # Mathématiques
+
+# 2. Conditions
+cargo run examples/test_003_conditions.ha              # if/else en haoussa
+
+# 3. Support Unicode
+cargo run examples/test_005_unicode_haoussa.ha         # Caractères spéciaux ƙɗɓ
+
+# 4. Programme complet
+cargo run examples/test_006_programme_complet.ha       # Calculatrice complète
+```
+
+### 🛠️ Test automatique
+```bash
+# Tester tous les exemples d'un coup
+./test_examples.sh
+```
+
+### 📚 Guide détaillé
+Consultez [`examples/README.md`](examples/README.md) pour :
+- Guide de progression pédagogique
+- Description détaillée de chaque exemple
+- État des fonctionnalités (✅ implémentées, ⏳ en cours)
+
 ## 🎯 Exemples / Misalai
 
 ### Hello World
@@ -275,6 +309,49 @@ dabara/
 - [ ] Support pour les commentaires
 - [ ] Importation de modules
 - [ ] Opérations sur fichiers
+
+## 📚 Documentation
+
+### Documentation en ligne
+
+La documentation complète de Dabara est disponible en ligne :
+
+- **📖 Documentation officielle** : [dabara-docs.vercel.app](https://dabara-docs.vercel.app) (à venir)
+- **🔧 Guide d'installation** : [Installation complète](docs/src/installation.md)
+- **🚀 Démarrage rapide** : [Quick Start](docs/src/quick-start.md)
+- **📋 Référence du langage** : [Syntaxe et exemples](docs/src/SUMMARY.md)
+
+### Construction locale de la documentation
+
+```bash
+# Installez mdBook
+cargo install mdbook
+
+# Construisez la documentation
+cd docs
+mdbook build
+
+# Serveur de développement
+mdbook serve --open
+```
+
+### Déploiement de la documentation
+
+```bash
+# Script automatique
+cd docs
+./build-and-deploy.sh vercel    # Déploie sur Vercel
+./build-and-deploy.sh netlify   # Déploie sur Netlify
+./build-and-deploy.sh github    # GitHub Pages
+./build-and-deploy.sh local     # Serveur local
+```
+
+**Ou avec npm** :
+```bash
+npm run build        # Construit la documentation
+npm run serve        # Serveur local
+npm run deploy:vercel # Déploie sur Vercel
+```
 
 ## 🤝 Contribution / Ba da gudummawa
 

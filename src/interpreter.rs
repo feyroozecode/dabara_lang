@@ -26,6 +26,8 @@ pub enum Value {
     String(String),
     /// Valeur booléenne
     Boolean(bool),
+    /// Liste de valeurs
+    List(Vec<Value>),
 }
 
 impl Value {
@@ -35,6 +37,12 @@ impl Value {
             Value::Number(n) => n.to_string(),
             Value::String(s) => s.clone(),
             Value::Boolean(b) => if *b { "gaskiya".to_string() } else { "karya".to_string() },
+            Value::List(elements) => {
+                let strings: Vec<String> = elements.iter()
+                    .map(|v| v.to_string())
+                    .collect();
+                format!("[{}]", strings.join(", "))
+            },
         }
     }
     
@@ -44,6 +52,7 @@ impl Value {
             Value::Number(_) => "lambar",
             Value::String(_) => "jimla",
             Value::Boolean(_) => "gaskiya ko karya",
+            Value::List(_) => "jerin abu",
         }
     }
 }
@@ -99,6 +108,37 @@ impl Interpreter {
                 self.functions.insert(name, function);
                 Ok(())
             }
+            
+            Statement::If { condition, then_branch, else_branch } => {
+                let condition_value = self.evaluate_expression(condition)?;
+                
+                // Évaluer la condition comme booléenne
+                let is_true = match condition_value {
+                    Value::Boolean(b) => b,
+                    Value::Number(n) => n != 0,
+                    Value::String(s) => !s.is_empty(),
+                    Value::List(l) => !l.is_empty(),
+                };
+                
+                if is_true {
+                    // Exécuter la branche then
+                    for statement in then_branch {
+                        self.execute_statement(statement)?;
+                    }
+                } else if let Some(else_stmt) = else_branch {
+                    // Exécuter la branche else
+                    self.execute_statement(*else_stmt)?;
+                }
+                
+                Ok(())
+            }
+            
+            Statement::Expression(expression) => {
+                // Exécuter l'expression et ignorer le résultat
+                // Utile pour les appels de fonctions standalone
+                self.evaluate_expression(expression)?;
+                Ok(())
+            }
         }
     }
     
@@ -106,30 +146,36 @@ impl Interpreter {
     fn evaluate_expression(&mut self, expression: Expression) -> Result<Value, Error> {
         match expression {
             Expression::Number(n) => Ok(Value::Number(n)),
-            
             Expression::String(s) => Ok(Value::String(s)),
-            
             Expression::Boolean(b) => Ok(Value::Boolean(b)),
-            
+            Expression::List(elements) => {
+                let mut values = Vec::new();
+                for element in elements {
+                    let value = self.evaluate_expression(element)?;
+                    values.push(value);
+                }
+                Ok(Value::List(values))
+            }
             Expression::Identifier(name) => {
-                self.variables.get(&name)
-                    .cloned()
-                    .ok_or_else(|| Error::variable_not_found(&name))
-            }
-            
+                        self.variables.get(&name)
+                            .cloned()
+                            .ok_or_else(|| Error::variable_not_found(&name))
+                    }
             Expression::BinaryOp { left, operator, right } => {
-                let left_val = self.evaluate_expression(*left)?;
-                let right_val = self.evaluate_expression(*right)?;
+                        let left_val = self.evaluate_expression(*left)?;
+                        let right_val = self.evaluate_expression(*right)?;
                 
-                self.evaluate_binary_operation(left_val, operator, right_val)
-            }
-            
+                        self.evaluate_binary_operation(left_val, operator, right_val)
+                    }
             Expression::FunctionCall { name, arguments } => {
-                self.call_function(name, arguments)
-            }
-            
+                        self.call_function(name, arguments)
+                    }
             Expression::Input => {
-                self.get_user_input()
+                        self.get_user_input()
+                    }
+            Expression::MethodCall { receiver: _, method: _, arguments: _ } => {
+                // TODO: Implémenter les appels de méthode
+                Err(Error::runtime_error("Les appels de méthode ne sont pas encore implémentés"))
             }
         }
     }
@@ -197,6 +243,40 @@ impl Interpreter {
                 Ok(Value::String(format!("{}{}", left.to_string(), right.to_string())))
             }
             
+            // Opérateurs de comparaison
+            (Value::Number(a), BinaryOperator::Equal, Value::Number(b)) => {
+                Ok(Value::Boolean(a == b))
+            }
+            (Value::String(ref a), BinaryOperator::Equal, Value::String(ref b)) => {
+                Ok(Value::Boolean(a == b))
+            }
+            (Value::Boolean(a), BinaryOperator::Equal, Value::Boolean(b)) => {
+                Ok(Value::Boolean(a == b))
+            }
+            
+            (Value::Number(a), BinaryOperator::NotEqual, Value::Number(b)) => {
+                Ok(Value::Boolean(a != b))
+            }
+            (Value::String(ref a), BinaryOperator::NotEqual, Value::String(ref b)) => {
+                Ok(Value::Boolean(a != b))
+            }
+            (Value::Boolean(a), BinaryOperator::NotEqual, Value::Boolean(b)) => {
+                Ok(Value::Boolean(a != b))
+            }
+            
+            (Value::Number(a), BinaryOperator::Less, Value::Number(b)) => {
+                Ok(Value::Boolean(a < b))
+            }
+            (Value::Number(a), BinaryOperator::Greater, Value::Number(b)) => {
+                Ok(Value::Boolean(a > b))
+            }
+            (Value::Number(a), BinaryOperator::LessEqual, Value::Number(b)) => {
+                Ok(Value::Boolean(a <= b))
+            }
+            (Value::Number(a), BinaryOperator::GreaterEqual, Value::Number(b)) => {
+                Ok(Value::Boolean(a >= b))
+            }
+            
             // Opérations invalides
             (left, op, right) => {
                 let op_name = match op {
@@ -205,6 +285,12 @@ impl Interpreter {
                     BinaryOperator::Multiply => "ninka",
                     BinaryOperator::Divide => "raba",
                     BinaryOperator::Concat => "+",
+                    BinaryOperator::Equal => "==",
+                    BinaryOperator::NotEqual => "!=",
+                    BinaryOperator::Less => "<",
+                    BinaryOperator::Greater => ">",
+                    BinaryOperator::LessEqual => "<=",
+                    BinaryOperator::GreaterEqual => ">=",
                 };
                 
                 Err(Error::invalid_operation(
