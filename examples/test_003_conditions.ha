@@ -23,6 +23,7 @@ fara
     naɗa daraja = 85
     rubuta ""
     rubuta "Daraja: "
+    
     rubuta daraja
     
     idan daraja >= 90 {
