@@ -11,7 +11,7 @@ use dabara::{tokenize, parse, Interpreter, Error};
 
 fn main() {
     let matches = Command::new("dabara")
-        .version("0.1.1")
+        .version("0.1.2")
         .about("Dabara Programming Language - Hausa syntax for everyone / Yaren shirye-shirye ta Dabara - Kalmar Hausa don kowa")
         .long_about("Dabara est un langage de programmation utilisant des mots-clés en haoussa.\nIl permet aux locuteurs Hausa d'apprendre et d'utiliser la programmation dans leur langue maternelle.")
         .arg(Arg::new("file")
