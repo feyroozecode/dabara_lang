@@ -72,13 +72,13 @@ pub enum Expression {
 /// Opérateurs binaires supportés
 #[derive(Debug, Clone)]
 pub enum BinaryOperator {
-    /// Addition (ƙara)
+    /// Addition (+)
     Add,
-    /// Soustraction (rage)
+    /// Soustraction (-)
     Subtract,
-    /// Multiplication (ninka)
+    /// Multiplication (*)
     Multiply,
-    /// Division (raba)
+    /// Division (/)
     Divide,
     /// Concaténation (+)
     Concat,
@@ -475,8 +475,6 @@ impl Parser {
             let operator = match self.current_token {
                 Token::Plus => {
                     self.advance()?;
-                    // Déterminer s'il s'agit d'addition ou de concaténation
-                    // sera déterminé lors de l'évaluation selon les types
                     BinaryOperator::Add
                 }
                 Token::Minus => {

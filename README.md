@@ -56,7 +56,7 @@
 - [Rust](https://rustup.rs/) (version 1.70+)
 
 #### Compilation
-```bash
+```
 git clone https://github.com/votre-username/dabara.git
 cd dabara
 cargo build --release
@@ -66,20 +66,20 @@ cargo install --path .
 ## 📖 Utilisation / Yadda ake amfani
 
 ### Commande de base
-```bash
+```
 dabara programme.ha
 ```
 
 ### Exemple de programme simple
 Créez un fichier `sannu.ha` :
-```hausa
+```
 fara
   rubuta "Sannu duniya!"
 ƙare
 ```
 
 Exécutez-le :
-```bash
+```
 dabara sannu.ha
 ```
 
@@ -100,16 +100,17 @@ Sannu duniya!
 | `naɗa` | `nada` | créer/définir | Déclarer une variable | `naɗa sunan = "Ahmad"` ou `nada sunan = "Ahmad"` |
 | `gaskiya` | `gaskiya` | vrai | Valeur booléenne vraie | `naɗa sahihi = gaskiya` |
 | `karya` | `karya` | faux | Valeur booléenne fausse | `naɗa karami = karya` |
-| `ƙara` | `kara` | ajouter | Addition | `lambar1 ƙara lambar2` ou `lambar1 kara lambar2` |
-| `rage` | `rage` | retirer | Soustraction | `lambar1 rage lambar2` |
+| `+` | `+` | ajouter | Addition | `lambar1 + lambar2` |
+| `-` | `-` | retirer | Soustraction | `lambar1 - lambar2` |
+| `*` | `*` | multiplier | Multiplication | `lambar1 * lambar2` |
+| `/` | `/` | diviser | Division | `lambar1 / lambar2` |
 
 > 💡 **Accessibilité** : Pour faciliter l'utilisation sur tous les claviers, vous pouvez maintenant utiliser soit les caractères haoussa originaux soit les variantes latines :
 > - `ƙare` ou `kare` (fin)
 > - `naɗa` ou `nada` (déclaration)
-> - `ƙara` ou `kara` (addition)
 
 ### Structure d'un programme
-``hausa
+```
 fara
   // Votre code ici
 ƙare
@@ -121,7 +122,7 @@ fara
 - **Boolean** : `gaskiya`, `karya`
 
 ### Variables
-```hausa
+```
 fara
   naɗa sunan = "Khadija"
   naɗa shekarun = 25
@@ -130,7 +131,7 @@ fara
 ```
 
 ### Affichage
-```hausa
+```
 fara
   rubuta "Sannu!"
   rubuta 42
@@ -139,19 +140,23 @@ fara
 ```
 
 ### Arithmétique
-```hausa
+```
 fara
   naɗa a = 10
   naɗa b = 5
-  naɗa jimla = a ƙara b      // Addition: 15
-  naɗa bambanci = a rage b   // Soustraction: 5
+  naɗa jimla = a + b      // Addition: 15
+  naɗa bambanci = a - b   // Soustraction: 5
+  naɗa ninka = a * b      // Multiplication: 50
+  naɗa raba = a / b       // Division: 2
   rubuta jimla
   rubuta bambanci
+  rubuta ninka
+  rubuta raba
 ƙare
 ```
 
 ### Concaténation de chaînes
-```hausa
+```
 fara
   naɗa sunan = "Ahmad"
   rubuta "Sannu " + sunan    // Affiche: Sannu Ahmad
@@ -164,7 +169,7 @@ Nous avons organisé des exemples par catégories pour faciliter l'apprentissage
 
 ### ✅ Exemples fonctionnels (testez-les !)
 
-```bash
+```
 # 1. Bases du langage
 cargo run examples/test_001_variables_et_affichage.ha  # Variables et affichage
 cargo run examples/test_001b_listes.ha                # Listes [1,2,3]
@@ -181,7 +186,7 @@ cargo run examples/test_006_programme_complet.ha       # Calculatrice complète
 ```
 
 ### 🛠️ Test automatique
-```bash
+```
 # Tester tous les exemples d'un coup
 ./test_examples.sh
 ```
@@ -195,14 +200,14 @@ Consultez [`examples/README.md`](examples/README.md) pour :
 ## 🎯 Exemples / Misalai
 
 ### Hello World
-``hausa
+```
 fara
   rubuta "Sannu! Ina kwana?"
 ƙare
 ```
 
 ### Variables et affichage
-``hausa
+```
 fara
   naɗa sunan = "Khadija"
   naɗa shekarun = 25
@@ -213,7 +218,7 @@ fara
 ```
 
 ### Calculs mathématiques
-``hausa
+```
 fara
   naɗa lambar1 = 10
   naɗa lambar2 = 5
@@ -228,7 +233,7 @@ fara
 ```
 
 ### Valeurs booléennes
-```hausa
+```
 fara
   naɗa sahihi = gaskiya
   naɗa karami = karya
@@ -238,7 +243,7 @@ fara
 ```
 
 ### Exemple avec variantes latines (même résultat)
-```hausa
+```
 fara
   nada sunan = "Ahmad"
   nada lambar = 42
@@ -262,17 +267,17 @@ Tous les messages d'erreur sont en haoussa pour une meilleure compréhension :
 ## 🧪 Tests
 
 ### Lancer les tests
-```bash
+```
 cargo test
 ```
 
 ### Tests avec sortie détaillée
-```bash
+```
 cargo test -- --nocapture
 ```
 
 ### Tests d'intégration
-```bash
+```
 cargo test --test integration_tests
 ```
 
@@ -280,7 +285,7 @@ cargo test --test integration_tests
 
 ### Mode debug
 Activez le mode debug pour voir les tokens et l'AST :
-```bash
+```
 export DABARA_DEBUG=1
 dabara programme.ha
 ```
@@ -323,7 +328,7 @@ La documentation complète de Dabara est disponible en ligne :
 
 ### Construction locale de la documentation
 
-```bash
+```
 # Installez mdBook
 cargo install mdbook
 
@@ -337,7 +342,7 @@ mdbook serve --open
 
 ### Déploiement de la documentation
 
-```bash
+```
 # Script automatique
 cd docs
 ./build-and-deploy.sh vercel    # Déploie sur Vercel
@@ -347,7 +352,7 @@ cd docs
 ```
 
 **Ou avec npm** :
-```bash
+```
 npm run build        # Construit la documentation
 npm run serve        # Serveur local
 npm run deploy:vercel # Déploie sur Vercel

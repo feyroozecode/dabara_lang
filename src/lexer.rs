@@ -15,10 +15,6 @@ pub enum Token {
     Let,        // naɗa
     True,       // gaskiya
     False,      // karya
-    Plus,       // ƙara
-    Minus,      // rage
-    Multiply,   // ninka
-    Divide,     // raba
     Function,   // aiki
     Input,      // karɓa
     
@@ -52,7 +48,11 @@ pub enum Token {
     Number(i64),
     String(String),
     
-    // Opérateurs
+    // Opérateurs standard
+    Plus,       // +
+    Minus,      // -
+    Multiply,   // *
+    Divide,     // /
     Equals,     // =
     
     // Délimiteurs
@@ -71,10 +71,6 @@ impl Token {
             "naɗa" => Some(Token::Let),
             "gaskiya" => Some(Token::True),
             "karya" => Some(Token::False),
-            "ƙara" => Some(Token::Plus),
-            "rage" => Some(Token::Minus),
-            "ninka" => Some(Token::Multiply),
-            "raba" => Some(Token::Divide),
             "aiki" => Some(Token::Function),
             "karɓa" => Some(Token::Input),
             
@@ -86,7 +82,6 @@ impl Token {
             // Versions alternatives avec caractères latins
             "kare" => Some(Token::End),      // Alternative pour ƙare
             "nada" => Some(Token::Let),      // Alternative pour naɗa  
-            "kara" => Some(Token::Plus),     // Alternative pour ƙara
             
             _ => None,
         }
