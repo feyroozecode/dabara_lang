@@ -15,8 +15,8 @@ Cette version marque une **révolution pédagogique** pour Dabara avec l'ajout d
 naɗa jerin_lambobi = [1, 2, 3, 4, 5]
 naɗa jerin_sunaye = ["Ahmad", "Fatima", "Musa"]
 naɗa jerin_gauraye = [gaskiya, karya, gaskiya]
-naɗa jerin_babu = []  # Liste vide
-naɗa jerin_daban = [1, "Ahmad", gaskiya]  # Types mixtes
+naɗa jerin_babu = []  // Liste vide
+naɗa jerin_daban = [1, "Ahmad", gaskiya]  // Types mixtes
 ```
 
 ### 2. Conditions Complètes (`idan`/`amma`/`ammaina`)
@@ -61,7 +61,7 @@ idan daraja >= 90 {
 ### 1. Lexer Renforcé
 - ✅ **Correction des patterns inaccessibles** dans la reconnaissance des tokens
 - ✅ **Support complet des crochets** `[` et `]` pour les listes
-- ✅ **Gestion améliore des opérateurs** de comparaison
+- ✅ **Gestion améliorée des opérateurs** de comparaison
 - ✅ **Tokens séparés** pour éviter les conflits (ex: `ninka` vs variables)
 
 ### 2. Parser Étendu
@@ -75,6 +75,12 @@ idan daraja >= 90 {
 - ✅ **Exécution des conditions** avec logique booléenne
 - ✅ **Opérations de comparaison** sur tous types
 - ✅ **Variables non utilisées** corrigées pour éviter les warnings
+
+### 4. Simplification de la Syntaxe
+- ✅ **Suppression des mots-clés Hausa pour les opérations arithmétiques**
+- ✅ **Conservation des opérateurs standards** : `+`, `-`, `*`, `/`
+- ✅ **Simplification de l'apprentissage** avec syntaxe familière
+- ✅ **Compatibilité améliorée** avec les outils de développement
 
 ## 📚 Révolution Pédagogique - Exemples Réorganisés
 
@@ -139,10 +145,10 @@ fara
     naɗa lamba1 = 25
     naɗa lamba2 = 10
     
-    naɗa jimla = lamba1 ƙara lamba2
-    naɗa bambanci = lamba1 rage lamba2
-    naɗa ninka = lamba1 ninka lamba2
-    naɗa raba = lamba1 raba lamba2
+    naɗa jimla = lamba1 + lamba2
+    naɗa bambanci = lamba1 - lamba2
+    naɗa ninka = lamba1 * lamba2
+    naɗa raba = lamba1 / lamba2
     
     # Conditions avec résultats
     idan jimla > 30 {
@@ -162,7 +168,7 @@ fara
     naɗa ɗan_makaranta = "Ahmed"
     naɗa ƴan_mata = ["Aisha", "Khadija", "Maryam"]
     
-    naɗa jimlar_ƙarfi = ƙarfin ƙara 50
+    naɗa jimlar_ƙarfi = ƙarfin + 50
     rubuta "Jimlar ƙarfi: "
     rubuta jimlar_ƙarfi
 ƙare
@@ -189,7 +195,7 @@ APRÈS v0.1.3:
 ### Fonctionnalités Implémentées
 - ✅ **Variables et types** (nombres, chaînes, booléens)
 - ✅ **Listes complètes** avec types mixtes
-- ✅ **Opérations arithmétiques** (ƙara, rage, ninka, raba)
+- ✅ **Opérations arithmétiques** (+, -, *, /)
 - ✅ **Conditions logiques** (idan, amma, ammaina)
 - ✅ **Comparaisons** (==, !=, <, >, <=, >=)
 - ✅ **Support Unicode** complet pour le haoussa

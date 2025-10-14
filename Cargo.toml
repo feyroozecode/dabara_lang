@@ -1,6 +1,6 @@
 [package]
 name = "dabara"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Ahmad - Feyroozecode"]
 description = "Dabara Programming Language - Hausa syntax for everyone"
