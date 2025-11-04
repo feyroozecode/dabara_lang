@@ -49,10 +49,10 @@ pub enum Token {
     String(String),
     
     // Opérateurs standard
-    Plus,       // +
-    Minus,      // -
-    Multiply,   // *
-    Divide,     // /
+    Plus,       // + (ƙara / kara)
+    Minus,      // - (rage)
+    Multiply,   // * (ninka)
+    Divide,     // / (raba)
     Equals,     // =
     
     // Délimiteurs
@@ -74,6 +74,12 @@ impl Token {
             "aiki" => Some(Token::Function),
             "karɓa" => Some(Token::Input),
             
+            // Opérateurs arithmétiques en haoussa
+            "ƙara" => Some(Token::Plus),     // Addition
+            "rage" => Some(Token::Minus),    // Soustraction
+            "ninka" => Some(Token::Multiply), // Multiplication
+            "raba" => Some(Token::Divide),   // Division
+            
             // Conditions en hausa naturel
             "idan" => Some(Token::If),
             "amma" => Some(Token::Else),
@@ -81,7 +87,8 @@ impl Token {
             
             // Versions alternatives avec caractères latins
             "kare" => Some(Token::End),      // Alternative pour ƙare
-            "nada" => Some(Token::Let),      // Alternative pour naɗa  
+            "nada" => Some(Token::Let),      // Alternative pour naɗa
+            "kara" => Some(Token::Plus),     // Alternative pour ƙara
             
             _ => None,
         }

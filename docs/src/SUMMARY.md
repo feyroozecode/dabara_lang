@@ -18,6 +18,7 @@
 - [Types de données](./language/types.md)
 - [Variables](./language/variables.md)
 - [Opérateurs](./language/operators.md)
+- [Opérateurs Arithmétiques](./language/arithmetic-operators.md)
 - [Mots-clés](./language/keywords.md)
 - [Expressions](./language/expressions.md)
 - [Commentaires](./language/comments.md)
@@ -34,6 +35,8 @@
 - [Architecture du code](./development/code-architecture.md)
 - [Tests](./development/testing.md)
 - [Debugging](./development/debugging.md)
+- [Roadmap](./roadmap.md)
+- [Roadmap to v1.0](./roadmap-v1.0.md)
 
 # API et Outils
 

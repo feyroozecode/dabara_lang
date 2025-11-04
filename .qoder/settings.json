@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "ask": [
+      "Read(!/Users/ahmad/dev/rust_projects/dabara/**)",
+      "Edit(!/Users/ahmad/dev/rust_projects/dabara/**)"
+    ],
+    "allow": [
+      "Read(/Users/ahmad/dev/rust_projects/dabara/**)",
+      "Edit(/Users/ahmad/dev/rust_projects/dabara/**)"
+    ]
+  },
+  "memoryImport": {},
+  "monitoring": {}
+}
