@@ -1,1 +1,0 @@
-# Variables et calculs

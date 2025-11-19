@@ -1,1 +1,0 @@
-# Annexe B : Exercices pratiques

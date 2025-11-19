@@ -17,6 +17,7 @@ pub enum Token {
     False,      // karya
     Function,   // aiki
     Input,      // karɓa
+    Return,     // mayar
     
     // Conditions en hausa naturel
     If,         // idan
@@ -73,6 +74,7 @@ impl Token {
             "karya" => Some(Token::False),
             "aiki" => Some(Token::Function),
             "karɓa" => Some(Token::Input),
+            "mayar" => Some(Token::Return),
             
             // Opérateurs arithmétiques en haoussa
             "ƙara" => Some(Token::Plus),     // Addition

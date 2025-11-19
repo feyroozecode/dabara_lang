@@ -65,8 +65,8 @@ impl fmt::Display for Value {
 
 /// Interpréteur pour exécuter les programmes Dabara
 pub struct Interpreter {
-    /// Environnement des variables
-    variables: HashMap<String, Value>,
+    /// Stack de scopes pour les variables (0 = global, top = local)
+    scope_stack: Vec<HashMap<String, Value>>,
     /// Fonctions définies par l'utilisateur
     functions: HashMap<String, Function>,
 }
@@ -75,38 +75,70 @@ impl Interpreter {
     /// Crée un nouveau interpréteur
     pub fn new() -> Self {
         Interpreter {
-            variables: HashMap::new(),
+            scope_stack: vec![HashMap::new()], // Commence avec le scope global
             functions: HashMap::new(),
+        }
+    }
+    
+    /// Pousse un nouveau scope local
+    fn push_scope(&mut self) {
+        self.scope_stack.push(HashMap::new());
+    }
+    
+    /// Pop le scope courant
+    fn pop_scope(&mut self) {
+        if self.scope_stack.len() > 1 {
+            self.scope_stack.pop();
+        }
+    }
+    
+    /// Récupère une variable (cherche du scope local vers le global)
+    fn get_variable_value(&self, name: &str) -> Option<Value> {
+        // Chercher du scope le plus local au global
+        for scope in self.scope_stack.iter().rev() {
+            if let Some(value) = scope.get(name) {
+                return Some(value.clone());
+            }
+        }
+        None
+    }
+    
+    /// Définit une variable dans le scope courant
+    fn set_variable_value(&mut self, name: String, value: Value) {
+        if let Some(current_scope) = self.scope_stack.last_mut() {
+            current_scope.insert(name, value);
         }
     }
     
     /// Exécute un programme complet
     pub fn execute(&mut self, program: Program) -> Result<(), Error> {
         for statement in program.statements {
-            self.execute_statement(statement)?;
+            if let Some(_) = self.execute_statement(statement)? {
+                // Retour au niveau global n'a pas de sens, on l'ignore
+            }
         }
         Ok(())
     }
     
-    /// Exécute un statement
-    fn execute_statement(&mut self, statement: Statement) -> Result<(), Error> {
+    /// Exécute un statement et retourne Some(Value) si c'est un return
+    fn execute_statement(&mut self, statement: Statement) -> Result<Option<Value>, Error> {
         match statement {
             Statement::Let { name, value } => {
                 let evaluated_value = self.evaluate_expression(value)?;
-                self.variables.insert(name, evaluated_value);
-                Ok(())
+                self.set_variable_value(name, evaluated_value);
+                Ok(None)
             }
             
             Statement::Print(expression) => {
                 let value = self.evaluate_expression(expression)?;
                 println!("{}", value);
-                Ok(())
+                Ok(None)
             }
             
             Statement::FunctionDef { name, parameters, body } => {
                 let function = Function { parameters, body };
                 self.functions.insert(name, function);
-                Ok(())
+                Ok(None)
             }
             
             Statement::If { condition, then_branch, else_branch } => {
@@ -123,21 +155,30 @@ impl Interpreter {
                 if is_true {
                     // Exécuter la branche then
                     for statement in then_branch {
-                        self.execute_statement(statement)?;
+                        if let Some(return_value) = self.execute_statement(statement)? {
+                            return Ok(Some(return_value));
+                        }
                     }
                 } else if let Some(else_stmt) = else_branch {
                     // Exécuter la branche else
-                    self.execute_statement(*else_stmt)?;
+                    if let Some(return_value) = self.execute_statement(*else_stmt)? {
+                        return Ok(Some(return_value));
+                    }
                 }
                 
-                Ok(())
+                Ok(None)
+            }
+            
+            Statement::Return(expression) => {
+                let value = self.evaluate_expression(expression)?;
+                Ok(Some(value))
             }
             
             Statement::Expression(expression) => {
                 // Exécuter l'expression et ignorer le résultat
                 // Utile pour les appels de fonctions standalone
                 self.evaluate_expression(expression)?;
-                Ok(())
+                Ok(None)
             }
         }
     }
@@ -157,8 +198,7 @@ impl Interpreter {
                 Ok(Value::List(values))
             }
             Expression::Identifier(name) => {
-                        self.variables.get(&name)
-                            .cloned()
+                        self.get_variable_value(&name)
                             .ok_or_else(|| Error::variable_not_found(&name))
                     }
             Expression::BinaryOp { left, operator, right } => {
@@ -304,24 +344,67 @@ impl Interpreter {
     
     /// Retourne la valeur d'une variable (pour les tests)
     pub fn get_variable(&self, name: &str) -> Option<&Value> {
-        self.variables.get(name)
+        // Cherche dans le scope global (index 0)
+        self.scope_stack.get(0)?.get(name)
     }
     
     /// Définit une variable (pour les tests)
     pub fn set_variable(&mut self, name: String, value: Value) {
-        self.variables.insert(name, value);
+        if let Some(global_scope) = self.scope_stack.get_mut(0) {
+            global_scope.insert(name, value);
+        }
     }
     
     /// Efface toutes les variables
     pub fn clear_variables(&mut self) {
-        self.variables.clear();
+        self.scope_stack.clear();
+        self.scope_stack.push(HashMap::new()); // Recréer le scope global
     }
     
     /// Appelle une fonction définie par l'utilisateur
-    fn call_function(&mut self, name: String, _arguments: Vec<Expression>) -> Result<Value, Error> {
-        // TODO: Implémenter l'appel de fonction avec un environnement local
-        // Pour l'instant, retourner une erreur
-        Err(Error::runtime_error(&format!("Fonction '{}' ba ta da aiki ba tukuna (pas encore implémentée)", name)))
+    fn call_function(&mut self, name: String, arguments: Vec<Expression>) -> Result<Value, Error> {
+        // Récupérer la définition de la fonction
+        let function = self.functions.get(&name)
+            .cloned()
+            .ok_or_else(|| Error::runtime_error(&format!("Fonction '{}' ba a gani ba (fonction non trouvée)", name)))?;
+        
+        // Vérifier le nombre d'arguments
+        if arguments.len() != function.parameters.len() {
+            return Err(Error::runtime_error(&format!(
+                "Fonction '{}' tana bukata {} argument(s), amma {} an bayar (fonction '{}' attend {} argument(s), mais {} fourni(s))",
+                name, function.parameters.len(), arguments.len(), name, function.parameters.len(), arguments.len()
+            )));
+        }
+        
+        // Évaluer les arguments
+        let mut arg_values = Vec::new();
+        for arg in arguments {
+            let value = self.evaluate_expression(arg)?;
+            arg_values.push(value);
+        }
+        
+        // Créer un nouveau scope local
+        self.push_scope();
+        
+        // Lier les paramètres aux valeurs des arguments
+        for (param, arg_value) in function.parameters.iter().zip(arg_values.iter()) {
+            self.set_variable_value(param.clone(), arg_value.clone());
+        }
+        
+        // Exécuter le corps de la fonction
+        let mut return_value = Value::Number(0); // Valeur par défaut
+        for statement in function.body {
+            if let Some(value) = self.execute_statement(statement)? {
+                // Un return a été exécuté
+                return_value = value;
+                break;
+            }
+        }
+        
+        // Nettoyer le scope local
+        self.pop_scope();
+        
+        Ok(return_value)
     }
     
     /// Récupère l'entrée utilisateur

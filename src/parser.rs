@@ -31,6 +31,8 @@ pub enum Statement {
         then_branch: Vec<Statement>,
         else_branch: Option<Box<Statement>>,
     },
+    /// Statement de retour: mayar expression
+    Return(Expression),
     /// Statement d'expression (comme appel de fonction standalone)
     Expression(Expression),
 }
@@ -233,6 +235,7 @@ impl Parser {
             Token::Print => self.parse_print_statement(),
             Token::Function => self.parse_function_definition(),
             Token::If => self.parse_if_statement(),
+            Token::Return => self.parse_return_statement(),
             // Si c'est un identificateur, cela peut être un appel de fonction
             Token::Identifier(_) => {
                 let expression = self.parse_expression()?;
@@ -397,8 +400,12 @@ impl Parser {
             
             self.expect_token(Token::RightBrace)?;
             
-            // Créer un statement fictif pour else
-            Some(Box::new(Statement::Expression(Expression::Boolean(true))))
+            // Créer un If statement fictif avec condition true pour exécuter else_statements
+            Some(Box::new(Statement::If {
+                condition: Expression::Boolean(true),
+                then_branch: else_statements,
+                else_branch: None,
+            }))
         } else if self.current_token == Token::ElseIf {
             // Parse elseif comme un if imbriqué
             let elseif_statement = self.parse_if_statement()?;
@@ -412,6 +419,15 @@ impl Parser {
             then_branch,
             else_branch,
         })
+    }
+    
+    /// Parse un statement de retour: mayar expression
+    fn parse_return_statement(&mut self) -> Result<Statement, Error> {
+        self.advance()?; // Consommer 'mayar'
+        
+        let expression = self.parse_expression()?;
+        
+        Ok(Statement::Return(expression))
     }
     
     /// Parse une expression
