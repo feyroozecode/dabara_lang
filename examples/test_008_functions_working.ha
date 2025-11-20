@@ -1,4 +1,4 @@
-# Test 008: Fonctions avec retour - WORKING! ✅
+# Test 008: Fonctions avec retour - WORKING! 
 # Ce test démontre que les fonctions marchent maintenant!
 
 fara
@@ -80,4 +80,19 @@ fara
   rubuta sakamakon
   
   rubuta "=== Tous les tests réussis! ==="
+
+  # Test 8 
+  aiki barka(suna) {
+    mayar suna
+  }
+  naɗa sakamakon = barka("Ahmad Ibahim")
+  rubuta sakamakon
+
+  # Test 9 
+  aiki barka(suna) {
+    mayar suna
+  }
+  naɗa sakamakon = barka("Ahmad Ibahim")
+  rubuta sakamakon
+
 ƙare
