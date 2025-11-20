@@ -1,8 +1,8 @@
 # Changelog - Dabara v0.2.0
 
-## 🎉 Version 0.2.0 - Functions Are Here! (November 19, 2025)
+##  Version 0.2.0 - Functions Are Here! (November 19, 2025)
 
-### 🚀 Major Features
+###  Major Features
 
 #### ✨ Function Execution (CRITICAL)
 - **Implemented function calls** - Functions can now be called and executed!
@@ -67,4 +67,4 @@ rubuta factorial(5)  # Output: 120
 
 ---
 
-**Dabara is now a real programming language!** 🎊
+**Dabara is now a real programming language!** 
