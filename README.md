@@ -1,4 +1,4 @@
-# Dabara Programming Language v0.1.1
+# Dabara Programming Language v0.1.2
 
 **Dabara** (_prononcé dah-BAH-rah_) est un langage de programmation utilisant des mots-clés en haoussa, conçu pour démocratiser l'accès à la programmation pour les communautés Hausa.
 
