@@ -23,7 +23,14 @@ pub enum Token {
     If,         // idan
     Else,       // amma
     ElseIf,     // ammaina
-    
+
+    // Boucles (loops)
+    While,      // maimaita
+    For,        // ga
+    In,         // cikin
+    Break,      // katse
+    Continue,   // ci_gaba
+
     // Comparaisons
     Equal,      // == (daidai)
     NotEqual,   // != (ba daidai ba)
@@ -47,6 +54,7 @@ pub enum Token {
     // Littéraux
     Identifier(String),
     Number(i64),
+    Float(f64),
     String(String),
     
     // Opérateurs standard
@@ -75,23 +83,27 @@ impl Token {
             "aiki" => Some(Token::Function),
             "karɓa" => Some(Token::Input),
             "mayar" => Some(Token::Return),
-            
-            // Opérateurs arithmétiques en haoussa
-            "ƙara" => Some(Token::Plus),     // Addition
-            "rage" => Some(Token::Minus),    // Soustraction
-            "ninka" => Some(Token::Multiply), // Multiplication
-            "raba" => Some(Token::Divide),   // Division
-            
+
+            // Note: Removed Hausa operator keywords (ƙara, rage, ninka, raba)
+            // to avoid conflicts with method names. Use symbols: +, -, *, /
+
             // Conditions en hausa naturel
             "idan" => Some(Token::If),
             "amma" => Some(Token::Else),
             "ammaina" => Some(Token::ElseIf),
-            
+
+            // Boucles (loops)
+            "maimaita" => Some(Token::While),
+            "ga" => Some(Token::For),
+            "cikin" => Some(Token::In),
+            "katse" => Some(Token::Break),
+            "ci_gaba" => Some(Token::Continue),
+
             // Versions alternatives avec caractères latins
             "kare" => Some(Token::End),      // Alternative pour ƙare
             "nada" => Some(Token::Let),      // Alternative pour naɗa
-            "kara" => Some(Token::Plus),     // Alternative pour ƙara
-            
+            // Note: "kara" removed from keywords to allow it as method name
+
             _ => None,
         }
     }
@@ -149,20 +161,30 @@ impl Lexer {
         }
     }
     
-    /// Lit un nombre
-    fn read_number(&mut self) -> i64 {  
+    /// Lit un nombre (entier ou flottant)
+    fn read_number(&mut self) -> Token {
         let mut number_str = String::new();
-        
+        let mut is_float = false;
+
         while let Some(ch) = self.current_char {
             if ch.is_ascii_digit() {
+                number_str.push(ch);
+                self.advance();
+            } else if ch == '.' && self.peek().map_or(false, |c| c.is_ascii_digit()) {
+                // C'est un point décimal suivi d'un chiffre
+                is_float = true;
                 number_str.push(ch);
                 self.advance();
             } else {
                 break;
             }
         }
-        
-        number_str.parse().unwrap_or(0)
+
+        if is_float {
+            Token::Float(number_str.parse().unwrap_or(0.0))
+        } else {
+            Token::Number(number_str.parse().unwrap_or(0))
+        }
     }
     
     /// Lit une chaîne de caractères
@@ -325,11 +347,16 @@ impl Lexer {
                     return Ok(Token::String(string_val));
                 }
                 
-                Some(ch) if ch.is_ascii_digit() => {
-                    let number = self.read_number();
-                    return Ok(Token::Number(number));
+                Some('.') if !self.peek().map_or(false, |c| c.is_ascii_digit()) => {
+                    // C'est un point de méthode, pas un nombre décimal
+                    self.advance();
+                    return Ok(Token::Dot);
                 }
-                
+
+                Some(ch) if ch.is_ascii_digit() || (ch == '.' && self.peek().map_or(false, |c| c.is_ascii_digit())) => {
+                    return Ok(self.read_number());
+                }
+
                 Some(ch) if ch.is_alphabetic() || self.is_hausa_char(ch) => {
                     let identifier = self.read_identifier();
                     

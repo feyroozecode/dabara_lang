@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::io::{self, Write};
 
-use crate::parser::{Program, Statement, Expression, BinaryOperator};
+use crate::parser::{Program, Statement, Expression, BinaryOperator, UnaryOperator};
 use crate::error::Error;
 
 /// Représente une fonction définie par l'utilisateur
@@ -22,6 +22,8 @@ pub struct Function {
 pub enum Value {
     /// Nombre entier
     Number(i64),
+    /// Nombre flottant
+    Float(f64),
     /// Chaîne de caractères
     String(String),
     /// Valeur booléenne
@@ -35,6 +37,7 @@ impl Value {
     pub fn to_string(&self) -> String {
         match self {
             Value::Number(n) => n.to_string(),
+            Value::Float(f) => f.to_string(),
             Value::String(s) => s.clone(),
             Value::Boolean(b) => if *b { "gaskiya".to_string() } else { "karya".to_string() },
             Value::List(elements) => {
@@ -45,11 +48,12 @@ impl Value {
             },
         }
     }
-    
+
     /// Retourne le type de la valeur pour les messages d'erreur
     pub fn type_name(&self) -> &'static str {
         match self {
             Value::Number(_) => "lambar",
+            Value::Float(_) => "lambar mai daɗewa",
             Value::String(_) => "jimla",
             Value::Boolean(_) => "gaskiya ko karya",
             Value::List(_) => "jerin abu",
@@ -143,11 +147,12 @@ impl Interpreter {
             
             Statement::If { condition, then_branch, else_branch } => {
                 let condition_value = self.evaluate_expression(condition)?;
-                
+
                 // Évaluer la condition comme booléenne
                 let is_true = match condition_value {
                     Value::Boolean(b) => b,
                     Value::Number(n) => n != 0,
+                    Value::Float(f) => f != 0.0 && !f.is_nan(),
                     Value::String(s) => !s.is_empty(),
                     Value::List(l) => !l.is_empty(),
                 };
@@ -180,6 +185,69 @@ impl Interpreter {
                 self.evaluate_expression(expression)?;
                 Ok(None)
             }
+
+            Statement::While { condition, body } => {
+                loop {
+                    let condition_value = self.evaluate_expression(condition.clone())?;
+
+                    // Évaluer la condition comme booléenne
+                    let is_true = match condition_value {
+                        Value::Boolean(b) => b,
+                        Value::Number(n) => n != 0,
+                        Value::Float(f) => f != 0.0 && !f.is_nan(),
+                        Value::String(s) => !s.is_empty(),
+                        Value::List(l) => !l.is_empty(),
+                    };
+
+                    if !is_true {
+                        break;
+                    }
+
+                    // Exécuter le corps de la boucle
+                    for statement in body.clone() {
+                        if let Some(return_value) = self.execute_statement(statement)? {
+                            return Ok(Some(return_value));
+                        }
+                    }
+                }
+
+                Ok(None)
+            }
+
+            Statement::For { variable, iterable, body } => {
+                let iterable_value = self.evaluate_expression(iterable)?;
+
+                match iterable_value {
+                    Value::List(elements) => {
+                        for element in elements {
+                            self.set_variable_value(variable.clone(), element);
+
+                            for statement in body.clone() {
+                                if let Some(return_value) = self.execute_statement(statement)? {
+                                    return Ok(Some(return_value));
+                                }
+                            }
+                        }
+                    }
+                    _ => {
+                        return Err(Error::runtime_error(
+                            "Don loop yana bukata jeri (For loop requires a list)"
+                        ));
+                    }
+                }
+
+                Ok(None)
+            }
+
+            Statement::Break => {
+                // TODO: Implement break with control flow
+                Err(Error::runtime_error("katse ba a aiwatar ba tukuna (break not yet implemented)"))
+            }
+
+            Statement::Continue => {
+                // TODO: Implement continue with control flow
+                Err(Error::runtime_error("ci_gaba ba a aiwatar ba tukuna (continue not yet implemented)"))
+            }
         }
     }
     
@@ -187,6 +255,7 @@ impl Interpreter {
     fn evaluate_expression(&mut self, expression: Expression) -> Result<Value, Error> {
         match expression {
             Expression::Number(n) => Ok(Value::Number(n)),
+            Expression::Float(f) => Ok(Value::Float(f)),
             Expression::String(s) => Ok(Value::String(s)),
             Expression::Boolean(b) => Ok(Value::Boolean(b)),
             Expression::List(elements) => {
@@ -198,24 +267,55 @@ impl Interpreter {
                 Ok(Value::List(values))
             }
             Expression::Identifier(name) => {
-                        self.get_variable_value(&name)
-                            .ok_or_else(|| Error::variable_not_found(&name))
-                    }
+                self.get_variable_value(&name)
+                    .ok_or_else(|| Error::variable_not_found(&name))
+            }
             Expression::BinaryOp { left, operator, right } => {
-                        let left_val = self.evaluate_expression(*left)?;
-                        let right_val = self.evaluate_expression(*right)?;
-                
-                        self.evaluate_binary_operation(left_val, operator, right_val)
-                    }
+                let left_val = self.evaluate_expression(*left)?;
+                let right_val = self.evaluate_expression(*right)?;
+
+                self.evaluate_binary_operation(left_val, operator, right_val)
+            }
             Expression::FunctionCall { name, arguments } => {
-                        self.call_function(name, arguments)
-                    }
+                self.call_function(name, arguments)
+            }
             Expression::Input => {
-                        self.get_user_input()
+                self.get_user_input()
+            }
+            Expression::Index { object, index } => {
+                let obj_value = self.evaluate_expression(*object)?;
+                let idx_value = self.evaluate_expression(*index)?;
+
+                match (obj_value, idx_value) {
+                    (Value::List(elements), Value::Number(idx)) => {
+                        let index = self.normalize_index(idx, elements.len())?;
+                        elements.get(index)
+                            .cloned()
+                            .ok_or_else(|| Error::runtime_error("Lamba ya wuce iyaka (Index out of bounds)"))
                     }
-            Expression::MethodCall { receiver: _, method: _, arguments: _ } => {
-                // TODO: Implémenter les appels de méthode
-                Err(Error::runtime_error("Les appels de méthode ne sont pas encore implémentés"))
+                    (Value::String(s), Value::Number(idx)) => {
+                        let chars: Vec<char> = s.chars().collect();
+                        let index = self.normalize_index(idx, chars.len())?;
+                        chars.get(index)
+                            .map(|c| Value::String(c.to_string()))
+                            .ok_or_else(|| Error::runtime_error("Lamba ya wuce iyaka (Index out of bounds)"))
+                    }
+                    _ => {
+                        Err(Error::runtime_error("Indexing yana bukata jeri ko jimla (Indexing requires a list or string)"))
+                    }
+                }
+            }
+            Expression::MethodCall { receiver, method, arguments } => {
+                self.call_method(*receiver, method, arguments)
+            }
+            Expression::UnaryOp { operator, operand } => {
+                let operand_val = self.evaluate_expression(*operand)?;
+                match (operator, operand_val) {
+                    (UnaryOperator::Negate, Value::Number(n)) => Ok(Value::Number(-n)),
+                    (UnaryOperator::Negate, Value::Float(f)) => Ok(Value::Float(-f)),
+                    (UnaryOperator::Not, Value::Boolean(b)) => Ok(Value::Boolean(!b)),
+                    _ => Err(Error::runtime_error("Invalid unary operation")),
+                }
             }
         }
     }
@@ -251,7 +351,60 @@ impl Interpreter {
                     Ok(Value::Number(a / b))
                 }
             }
-            
+
+            // Float arithmetic
+            (Value::Float(a), BinaryOperator::Add, Value::Float(b)) => Ok(Value::Float(a + b)),
+            (Value::Number(a), BinaryOperator::Add, Value::Float(b)) => Ok(Value::Float(a as f64 + b)),
+            (Value::Float(a), BinaryOperator::Add, Value::Number(b)) => Ok(Value::Float(a + b as f64)),
+
+            (Value::Float(a), BinaryOperator::Subtract, Value::Float(b)) => Ok(Value::Float(a - b)),
+            (Value::Number(a), BinaryOperator::Subtract, Value::Float(b)) => Ok(Value::Float(a as f64 - b)),
+            (Value::Float(a), BinaryOperator::Subtract, Value::Number(b)) => Ok(Value::Float(a - b as f64)),
+
+            (Value::Float(a), BinaryOperator::Multiply, Value::Float(b)) => Ok(Value::Float(a * b)),
+            (Value::Number(a), BinaryOperator::Multiply, Value::Float(b)) => Ok(Value::Float(a as f64 * b)),
+            (Value::Float(a), BinaryOperator::Multiply, Value::Number(b)) => Ok(Value::Float(a * b as f64)),
+
+            (Value::Float(a), BinaryOperator::Divide, Value::Float(b)) => {
+                if b == 0.0 {
+                    Err(Error::runtime_error("Ba za a iya raba da sifili ba (Division par zéro)"))
+                } else {
+                    Ok(Value::Float(a / b))
+                }
+            }
+            (Value::Number(a), BinaryOperator::Divide, Value::Float(b)) => {
+                if b == 0.0 {
+                    Err(Error::runtime_error("Ba za a iya raba da sifili ba (Division par zéro)"))
+                } else {
+                    Ok(Value::Float(a as f64 / b))
+                }
+            }
+            (Value::Float(a), BinaryOperator::Divide, Value::Number(b)) => {
+                if b == 0 {
+                    Err(Error::runtime_error("Ba za a iya raba da sifili ba (Division par zéro)"))
+                } else {
+                    Ok(Value::Float(a / b as f64))
+                }
+            }
+
+            // Float comparisons
+            (Value::Float(a), BinaryOperator::Equal, Value::Float(b)) => Ok(Value::Boolean((a - b).abs() < f64::EPSILON)),
+            (Value::Float(a), BinaryOperator::NotEqual, Value::Float(b)) => Ok(Value::Boolean((a - b).abs() >= f64::EPSILON)),
+            (Value::Float(a), BinaryOperator::Less, Value::Float(b)) => Ok(Value::Boolean(a < b)),
+            (Value::Float(a), BinaryOperator::Greater, Value::Float(b)) => Ok(Value::Boolean(a > b)),
+            (Value::Float(a), BinaryOperator::LessEqual, Value::Float(b)) => Ok(Value::Boolean(a <= b)),
+            (Value::Float(a), BinaryOperator::GreaterEqual, Value::Float(b)) => Ok(Value::Boolean(a >= b)),
+
+            // Mixed int/float comparisons
+            (Value::Number(a), BinaryOperator::Less, Value::Float(b)) => Ok(Value::Boolean((a as f64) < b)),
+            (Value::Float(a), BinaryOperator::Less, Value::Number(b)) => Ok(Value::Boolean(a < (b as f64))),
+            (Value::Number(a), BinaryOperator::Greater, Value::Float(b)) => Ok(Value::Boolean((a as f64) > b)),
+            (Value::Float(a), BinaryOperator::Greater, Value::Number(b)) => Ok(Value::Boolean(a > (b as f64))),
+            (Value::Number(a), BinaryOperator::LessEqual, Value::Float(b)) => Ok(Value::Boolean((a as f64) <= b)),
+            (Value::Float(a), BinaryOperator::LessEqual, Value::Number(b)) => Ok(Value::Boolean(a <= (b as f64))),
+            (Value::Number(a), BinaryOperator::GreaterEqual, Value::Float(b)) => Ok(Value::Boolean((a as f64) >= b)),
+            (Value::Float(a), BinaryOperator::GreaterEqual, Value::Number(b)) => Ok(Value::Boolean(a >= (b as f64))),
+
             // Concaténation de chaînes avec +
             (Value::String(a), BinaryOperator::Add, Value::String(b)) => {
                 Ok(Value::String(format!("{}{}", a, b)))
@@ -411,20 +564,131 @@ impl Interpreter {
     fn get_user_input(&mut self) -> Result<Value, Error> {
         print!("Rubuta abu: "); // "Écris quelque chose: "
         io::stdout().flush().unwrap();
-        
+
         let mut input = String::new();
         match io::stdin().read_line(&mut input) {
             Ok(_) => {
                 let trimmed = input.trim();
-                
+
                 // Essayer de parser comme nombre d'abord
                 if let Ok(num) = trimmed.parse::<i64>() {
                     Ok(Value::Number(num))
+                } else if let Ok(float_num) = trimmed.parse::<f64>() {
+                    Ok(Value::Float(float_num))
                 } else {
                     Ok(Value::String(trimmed.to_string()))
                 }
             }
             Err(_) => Err(Error::runtime_error("Ba za a iya karba shigarwa ba (Impossible de lire l'entrée)"))
+        }
+    }
+
+    /// Normalise un index (gère les indices négatifs)
+    fn normalize_index(&self, idx: i64, len: usize) -> Result<usize, Error> {
+        if idx < 0 {
+            let positive = (len as i64) + idx;
+            if positive < 0 {
+                return Err(Error::runtime_error("Lamba ya wuce iyaka (Index out of bounds)"));
+            }
+            Ok(positive as usize)
+        } else {
+            if idx as usize >= len {
+                return Err(Error::runtime_error("Lamba ya wuce iyaka (Index out of bounds)"));
+            }
+            Ok(idx as usize)
+        }
+    }
+
+    /// Appelle une méthode sur une valeur
+    fn call_method(&mut self, receiver: Expression, method: String, arguments: Vec<Expression>) -> Result<Value, Error> {
+        let receiver_value = self.evaluate_expression(receiver)?;
+
+        match (receiver_value, method.as_str()) {
+            // String methods
+            (Value::String(s), "tsawo") => {
+                Ok(Value::Number(s.chars().count() as i64))
+            }
+            (Value::String(s), "babba") => {
+                Ok(Value::String(s.to_uppercase()))
+            }
+            (Value::String(s), "ƙarami") | (Value::String(s), "karami") => {
+                Ok(Value::String(s.to_lowercase()))
+            }
+            (Value::String(s), "yanki") => {
+                if arguments.len() != 2 {
+                    return Err(Error::runtime_error("yanki yana bukata arguments 2 (yanki requires 2 arguments)"));
+                }
+                let start_val = self.evaluate_expression(arguments[0].clone())?;
+                let end_val = self.evaluate_expression(arguments[1].clone())?;
+
+                match (start_val, end_val) {
+                    (Value::Number(start), Value::Number(end)) => {
+                        let chars: Vec<char> = s.chars().collect();
+                        let start_idx = start.max(0) as usize;
+                        let end_idx = (end.max(0) as usize).min(chars.len());
+
+                        if start_idx <= end_idx && end_idx <= chars.len() {
+                            let substring: String = chars[start_idx..end_idx].iter().collect();
+                            Ok(Value::String(substring))
+                        } else {
+                            Err(Error::runtime_error("Yanki ya wuce iyaka (Substring out of bounds)"))
+                        }
+                    }
+                    _ => Err(Error::runtime_error("yanki yana bukata lambobi (yanki requires numbers)"))
+                }
+            }
+            (Value::String(s), "raba") => {
+                if arguments.len() != 1 {
+                    return Err(Error::runtime_error("raba yana bukata argument 1 (raba requires 1 argument)"));
+                }
+                let sep_val = self.evaluate_expression(arguments[0].clone())?;
+
+                match sep_val {
+                    Value::String(sep) => {
+                        let parts: Vec<Value> = s.split(&sep)
+                            .map(|p| Value::String(p.to_string()))
+                            .collect();
+                        Ok(Value::List(parts))
+                    }
+                    _ => Err(Error::runtime_error("raba yana bukata jimla (raba requires a string)"))
+                }
+            }
+
+            // List methods
+            (Value::List(elements), "tsawo") => {
+                Ok(Value::Number(elements.len() as i64))
+            }
+            (Value::List(mut elements), "ƙara") | (Value::List(mut elements), "kara") => {
+                if arguments.len() != 1 {
+                    return Err(Error::runtime_error("ƙara yana bukata argument 1 (ƙara requires 1 argument)"));
+                }
+                let item = self.evaluate_expression(arguments[0].clone())?;
+                elements.push(item);
+                Ok(Value::List(elements))
+            }
+            (Value::List(mut elements), "cire") => {
+                elements.pop()
+                    .ok_or_else(|| Error::runtime_error("Ba za a iya cire daga jerin komai ba (Cannot pop from empty list)"))
+            }
+            (Value::List(elements), "haɗa") | (Value::List(elements), "hada") => {
+                if arguments.len() != 1 {
+                    return Err(Error::runtime_error("haɗa yana bukata argument 1 (haɗa requires 1 argument)"));
+                }
+                let sep_val = self.evaluate_expression(arguments[0].clone())?;
+
+                match sep_val {
+                    Value::String(sep) => {
+                        let joined = elements.iter()
+                            .map(|v| v.to_string())
+                            .collect::<Vec<_>>()
+                            .join(&sep);
+                        Ok(Value::String(joined))
+                    }
+                    _ => Err(Error::runtime_error("haɗa yana bukata jimla (haɗa requires a string)"))
+                }
+            }
+
+            _ => Err(Error::runtime_error(&format!("Method '{}' ba a gani ba (Method not found)", method)))
         }
     }
 }

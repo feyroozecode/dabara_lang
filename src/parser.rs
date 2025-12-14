@@ -35,6 +35,21 @@ pub enum Statement {
     Return(Expression),
     /// Statement d'expression (comme appel de fonction standalone)
     Expression(Expression),
+    /// Boucle while: maimaita (condition) { corps }
+    While {
+        condition: Expression,
+        body: Vec<Statement>,
+    },
+    /// Boucle for: ga variable cikin iterable { corps }
+    For {
+        variable: String,
+        iterable: Expression,
+        body: Vec<Statement>,
+    },
+    /// Instruction break: katse
+    Break,
+    /// Instruction continue: ci_gaba
+    Continue,
 }
 
 /// Types d'expressions dans Dabara
@@ -69,6 +84,27 @@ pub enum Expression {
     },
     /// Entrée utilisateur
     Input,
+    /// Indexation: expression[index]
+    Index {
+        object: Box<Expression>,
+        index: Box<Expression>,
+    },
+    /// Nombre flottant
+    Float(f64),
+    /// Opération unaire
+    UnaryOp {
+        operator: UnaryOperator,
+        operand: Box<Expression>,
+    },
+}
+
+/// Opérateurs unaires supportés
+#[derive(Debug, Clone)]
+pub enum UnaryOperator {
+    /// Négation (-)
+    Negate,
+    /// Négation logique (!)
+    Not,
 }
 
 /// Opérateurs binaires supportés
@@ -153,14 +189,13 @@ impl Parser {
     /// Vérifie si c'est un appel de fonction sans parenthèses
     /// (le token suivant est un argument potentiel)
     fn is_function_call_without_parens(&self) -> bool {
-        matches!(self.current_token, 
-            Token::Number(_) | 
-            Token::String(_) | 
-            Token::Identifier(_) | 
-            Token::True | 
-            Token::False | 
-            Token::Input |
-            Token::LeftBracket
+        matches!(self.current_token,
+            Token::Number(_) |
+            Token::String(_) |
+            Token::Identifier(_) |
+            Token::True |
+            Token::False |
+            Token::Input
         )
     }
     
@@ -236,6 +271,16 @@ impl Parser {
             Token::Function => self.parse_function_definition(),
             Token::If => self.parse_if_statement(),
             Token::Return => self.parse_return_statement(),
+            Token::While => self.parse_while_statement(),
+            Token::For => self.parse_for_statement(),
+            Token::Break => {
+                self.advance()?;
+                Ok(Statement::Break)
+            }
+            Token::Continue => {
+                self.advance()?;
+                Ok(Statement::Continue)
+            }
             // Si c'est un identificateur, cela peut être un appel de fonction
             Token::Identifier(_) => {
                 let expression = self.parse_expression()?;
@@ -424,10 +469,99 @@ impl Parser {
     /// Parse un statement de retour: mayar expression
     fn parse_return_statement(&mut self) -> Result<Statement, Error> {
         self.advance()?; // Consommer 'mayar'
-        
+
         let expression = self.parse_expression()?;
-        
+
         Ok(Statement::Return(expression))
+    }
+
+    /// Parse une boucle while: maimaita (condition) { corps }
+    fn parse_while_statement(&mut self) -> Result<Statement, Error> {
+        self.advance()?; // Consommer 'maimaita'
+
+        // Parser la condition entre parenthèses
+        self.expect_token(Token::LeftParen)?;
+        let condition = self.parse_expression()?;
+        self.expect_token(Token::RightParen)?;
+
+        self.expect_token(Token::LeftBrace)?;
+
+        // Skip les newlines après {
+        while self.current_token == Token::Newline {
+            self.advance()?;
+        }
+
+        let mut body = Vec::new();
+
+        // Parse le corps de la boucle
+        while self.current_token != Token::RightBrace && self.current_token != Token::Eof {
+            if self.current_token == Token::Newline {
+                self.advance()?;
+                continue;
+            }
+
+            let statement = self.parse_statement()?;
+            body.push(statement);
+
+            // Skip les newlines après le statement
+            while self.current_token == Token::Newline {
+                self.advance()?;
+            }
+        }
+
+        self.expect_token(Token::RightBrace)?;
+
+        Ok(Statement::While { condition, body })
+    }
+
+    /// Parse une boucle for: ga variable cikin iterable { corps }
+    fn parse_for_statement(&mut self) -> Result<Statement, Error> {
+        self.advance()?; // Consommer 'ga'
+
+        // Parser le nom de la variable
+        let variable = match &self.current_token {
+            Token::Identifier(name) => {
+                let var_name = name.clone();
+                self.advance()?;
+                var_name
+            }
+            _ => return Err(Error::unexpected_token("identifier", &format!("{:?}", self.current_token))),
+        };
+
+        // Attendre 'cikin'
+        self.expect_token(Token::In)?;
+
+        // Parser l'expression itérable
+        let iterable = self.parse_expression()?;
+
+        self.expect_token(Token::LeftBrace)?;
+
+        // Skip les newlines après {
+        while self.current_token == Token::Newline {
+            self.advance()?;
+        }
+
+        let mut body = Vec::new();
+
+        // Parse le corps de la boucle
+        while self.current_token != Token::RightBrace && self.current_token != Token::Eof {
+            if self.current_token == Token::Newline {
+                self.advance()?;
+                continue;
+            }
+
+            let statement = self.parse_statement()?;
+            body.push(statement);
+
+            // Skip les newlines après le statement
+            while self.current_token == Token::Newline {
+                self.advance()?;
+            }
+        }
+
+        self.expect_token(Token::RightBrace)?;
+
+        Ok(Statement::For { variable, iterable, body })
     }
     
     /// Parse une expression
@@ -543,92 +677,182 @@ impl Parser {
     
     /// Parse une expression primaire (littéraux, identificateurs, appels de fonction)
     fn parse_primary_expression(&mut self) -> Result<Expression, Error> {
-        match &self.current_token.clone() {
+        // Handle unary operators first
+        let mut expr = match &self.current_token.clone() {
+            Token::Minus | Token::Plus => {
+                let op = match &self.current_token {
+                    Token::Minus => UnaryOperator::Negate,
+                    Token::Plus => return {
+                        self.advance()?;
+                        self.parse_primary_expression()
+                    },
+                    _ => unreachable!(),
+                };
+                self.advance()?;
+                let operand = self.parse_primary_expression()?;
+                Expression::UnaryOp {
+                    operator: op,
+                    operand: Box::new(operand),
+                }
+            }
             Token::Number(n) => {
                 let value = *n;
                 self.advance()?;
-                Ok(Expression::Number(value))
+                Expression::Number(value)
             }
-            
+
+            Token::Float(f) => {
+                let value = *f;
+                self.advance()?;
+                Expression::Float(value)
+            }
+
             Token::String(s) => {
                 let value = s.clone();
                 self.advance()?;
-                Ok(Expression::String(value))
+                Expression::String(value)
             }
-            
+
             Token::True => {
                 self.advance()?;
-                Ok(Expression::Boolean(true))
+                Expression::Boolean(true)
             }
-            
+
             Token::False => {
                 self.advance()?;
-                Ok(Expression::Boolean(false))
+                Expression::Boolean(false)
             }
-            
+
             Token::Input => {
                 self.advance()?;
-                Ok(Expression::Input)
+                Expression::Input
             }
-            
+
             Token::LeftBracket => {
-                self.parse_list_expression()
+                return self.parse_list_expression();
             }
-            
+
+            Token::LeftParen => {
+                self.advance()?; // Consommer '('
+                let inner_expr = self.parse_expression()?;
+                self.expect_token(Token::RightParen)?;
+                inner_expr
+            }
+
             Token::Identifier(name) => {
                 let var_name = name.clone();
                 self.advance()?;
-                
+
                 // Vérifier s'il s'agit d'un appel de fonction
                 // Syntaxe avec parenthèses : fonction(arg1, arg2)
                 if self.current_token == Token::LeftParen {
                     self.advance()?; // Consommer '('
-                    
+
                     let mut arguments = Vec::new();
-                    
+
                     // Parse les arguments
                     while self.current_token != Token::RightParen {
                         let arg = self.parse_comparison_expression()?;
                         arguments.push(arg);
-                        
+
                         if self.current_token == Token::Comma {
                             self.advance()?;
                         }
                     }
-                    
+
                     self.expect_token(Token::RightParen)?;
-                    
-                    Ok(Expression::FunctionCall {
+
+                    Expression::FunctionCall {
                         name: var_name,
                         arguments,
-                    })
+                    }
                 }
                 // Syntaxe sans parenthèses : fonction arg1 arg2 (style Ruby/Python)
                 else if self.is_function_call_without_parens() {
                     let mut arguments = Vec::new();
-                    
+
                     // Parse les arguments jusqu'à un délimiteur ou fin de ligne
                     while !self.is_end_of_expression() {
                         let arg = self.parse_primary_expression()?;
                         arguments.push(arg);
-                        
+
                         // Les arguments sont séparés par des espaces ou virgules
                         if self.current_token == Token::Comma {
                             self.advance()?;
                         }
                     }
-                    
-                    Ok(Expression::FunctionCall {
+
+                    Expression::FunctionCall {
                         name: var_name,
                         arguments,
-                    })
+                    }
                 } else {
-                    Ok(Expression::Identifier(var_name))
+                    Expression::Identifier(var_name)
                 }
             }
-            
-            _ => Err(Error::expected_expression()),
+
+            _ => return Err(Error::expected_expression()),
+        };
+
+        // Gérer l'indexation et les appels de méthode
+        loop {
+            match &self.current_token {
+                Token::LeftBracket => {
+                    // Indexation: expr[index]
+                    self.advance()?; // Consommer '['
+                    let index = self.parse_expression()?;
+                    self.expect_token(Token::RightBracket)?;
+
+                    expr = Expression::Index {
+                        object: Box::new(expr),
+                        index: Box::new(index),
+                    };
+                }
+                Token::Dot => {
+                    // Appel de méthode: expr.method(args)
+                    self.advance()?; // Consommer '.'
+
+                    let method_name = match &self.current_token {
+                        Token::Identifier(name) => {
+                            let method = name.clone();
+                            self.advance()?;
+                            method
+                        }
+                        _ => return Err(Error::unexpected_token("method name", &format!("{:?}", self.current_token))),
+                    };
+
+                    // Vérifier s'il y a des arguments
+                    let arguments = if self.current_token == Token::LeftParen {
+                        self.advance()?; // Consommer '('
+
+                        let mut args = Vec::new();
+
+                        while self.current_token != Token::RightParen {
+                            let arg = self.parse_comparison_expression()?;
+                            args.push(arg);
+
+                            if self.current_token == Token::Comma {
+                                self.advance()?;
+                            }
+                        }
+
+                        self.expect_token(Token::RightParen)?;
+                        args
+                    } else {
+                        Vec::new()
+                    };
+
+                    expr = Expression::MethodCall {
+                        receiver: Box::new(expr),
+                        method: method_name,
+                        arguments,
+                    };
+                }
+                _ => break,
+            }
         }
+
+        Ok(expr)
     }
     
     /// Parse une liste: [element1, element2, ...]
