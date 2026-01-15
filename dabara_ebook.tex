@@ -1,0 +1,1305 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{caption}
+
+% Configuration de la page
+\geometry{
+    a4paper,
+    left=2.5cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+% Configuration du code
+\definecolor{codeblue}{rgb}{0.25,0.5,0.5}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{dabarastyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegray},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single,
+    frameround=tttt
+}
+
+\lstset{style=dabarastyle}
+
+% En-têtes et pieds de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Dabara : Guide Rapide}
+\fancyhead[R]{Programmation en Hausa}
+\fancyfoot[C]{\thepage}
+
+% Titre du document
+\title{
+    \Huge \textbf{Dabara} \\
+    \Large Guide Rapide de Programmation en Hausa \\
+    \vspace{0.5cm}
+    \large Version 1.0
+}
+\author{}
+\date{}
+
+\begin{document}
+
+% Page de titre
+\maketitle
+\thispagestyle{empty}
+
+\vfill
+
+\begin{center}
+\textbf{À propos de ce guide}
+
+Ce guide vous accompagne dans l'apprentissage du langage de programmation Dabara, conçu pour rendre la programmation accessible aux francophones et aux locuteurs de langues nigériennes.
+
+\vspace{1cm}
+
+\textbf{Public cible} \\
+Débutants en programmation \\
+Développeurs curieux du multilinguisme technique \\
+Éducateurs en informatique
+
+\vspace{1cm}
+
+\textbf{Prérequis} \\
+Aucun - ce guide commence depuis zéro \\
+Un ordinateur avec accès à Internet \\
+Désir d'apprendre et de créer
+
+\vspace{1cm}
+
+\textbf{Durée estimée} \\
+Lecture complète : 4-6 heures \\
+Avec exercices : 8-12 heures
+
+\end{center}
+
+\newpage
+
+% Table des matières
+\tableofcontents
+\newpage
+
+% Début du contenu
+\section*{Introduction : Bienvenue dans Dabara}
+
+Dabara est un langage de programmation innovant qui rompt avec la tradition anglo-saxonne dominante dans le monde de l'informatique. Inspiré par le haoussa, l'une des langues les plus parlées en Afrique, Dabara offre une alternative multiculturelle à l'apprentissage de la programmation.
+
+\subsection*{Pourquoi Dabara ?}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Accessibilité linguistique} : Programmation en haoussa et français
+    \item \textbf{Culture locale} : Respect des traditions linguistiques africaines
+    \item \textbf{Apprentissage intuitif} : Syntaxe proche du langage naturel
+    \item \textbf{Innovation pédagogique} : Nouvelle approche de l'enseignement
+\end{itemize}
+
+\subsection*{Ce que vous allez apprendre}
+
+Ce guide couvre les bases essentielles de la programmation avec Dabara :
+
+\begin{enumerate}
+    \item Installation et configuration
+    \item Variables et types de données
+    \item Opérations mathématiques
+    \item Structures conditionnelles
+    \item Fonctions et modularité
+    \item Interaction avec l'utilisateur
+    \item Collections et listes
+    \item Projets pratiques
+\end{enumerate}
+
+\newpage
+
+\section{Installation et Configuration}
+
+Avant de commencer à programmer, configurons votre environnement de développement.
+
+\subsection{Méthodes d'installation}
+
+\subsubsection{Méthode 1 : Via Cargo (Recommandée)}
+
+Si vous avez Rust installé :
+
+\begin{lstlisting}[language=bash]
+# Installer Dabara depuis le dépôt officiel
+cargo install --git https://github.com/votre-compte/dabara
+
+# Vérifier l'installation
+dabara --version
+\end{lstlisting}
+
+\subsubsection{Méthode 2 : Compilation depuis les sources}
+
+\begin{lstlisting}[language=bash]
+# Cloner le dépôt
+git clone https://github.com/votre-compte/dabara
+cd dabara
+
+# Compiler
+cargo build --release
+
+# Copier l'exécutable dans votre PATH
+sudo cp target/release/dabara /usr/local/bin/
+\end{lstlisting}
+
+\subsubsection{Méthode 3 : Téléchargement direct}
+
+Téléchargez l'exécutable pré-compilé depuis la page des releases GitHub.
+
+\subsection{Vérification de l'installation}
+
+Testons que tout fonctionne correctement :
+
+\begin{lstlisting}[language=bash]
+# Créer un fichier test
+echo 'fara
+  rubuta "Barka da zuwa Dabara!"
+kare' > test.ha
+
+# Exécuter le programme
+dabara test.ha
+\end{lstlisting}
+
+Vous devriez voir : \texttt{Barka da zuwa Dabara!}
+
+\subsection{Structure d'un programme Dabara}
+
+Chaque programme Dabara suit cette structure :
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Votre code ici
+kare
+\end{lstlisting}
+
+\begin{description}
+    \item[\texttt{fara}] : Marque le début du programme (signifie "commencer")
+    \item[\texttt{kare}] : Marque la fin du programme (signifie "terminer")
+    \item[Indentation] : Le code est décalé vers la droite pour la lisibilité
+\end{description}
+
+\newpage
+
+\section{Les Fondamentaux}
+
+Commençons par les concepts de base de la programmation.
+
+\subsection{Variables et déclaration}
+
+Une variable est comme une boîte qui contient une valeur. Nous utilisons le mot-clé \texttt{naɗa} pour créer des variables.
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Déclaration de variables
+  naɗa sunan = "Ahmad"
+  naɗa shekarun = 25
+  naɗa aiki = "Mai shirye-shirye"
+  
+  # Affichage des variables
+  rubuta sunan
+  rubuta shekarun
+  rubuta aiki
+kare
+\end{lstlisting}
+
+\subsection{Types de données}
+
+Dabara supporte plusieurs types de données :
+
+\subsubsection{Textes (Chaînes de caractères)}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa sunan = "Fatima"
+  naɗa salutation = "Sannu Duniya!"
+  naɗa adresse = "Niamey, Niger"
+  
+  rubuta sunan
+  rubuta salutation
+  rubuta adresse
+kare
+\end{lstlisting}
+
+\subsubsection{Nombres}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa lambar = 42
+  naɗa temperature = -5
+  naɗa prix = 1250
+  
+  rubuta lambar
+  rubuta temperature
+  rubuta prix
+kare
+\end{lstlisting}
+
+\subsubsection{Booléens (Vrai/Faux)}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa gaskiya_ne = gaskiya  # vrai
+  naɗa karya_ne = karya      # faux
+  
+  rubuta gaskiya_ne
+  rubuta karya_ne
+kare
+\end{lstlisting}
+
+\subsection{Affichage avec \texttt{rubuta}}
+
+Le mot-clé \texttt{rubuta} permet d'afficher du texte ou des variables à l'écran.
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Afficher du texte simple
+  rubuta "Barka da safiya!"
+  
+  # Afficher une variable
+  naɗa sunan = "Musa"
+  rubuta sunan
+  
+  # Afficher plusieurs éléments
+  naɗa shekarun = 30
+  rubuta "Sunansa: " + sunan
+  rubuta "Shekarsa: " + shekarun
+kare
+\end{lstlisting}
+
+\subsection{Concaténation de textes}
+
+Vous pouvez combiner des textes et des variables avec l'opérateur \texttt{+} :
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa sunan = "Aisha"
+  naɗa gari = "Zinder"
+  
+  # Concaténation simple
+  rubuta "Sunanta: " + sunan
+  rubuta "Garinta: " + gari
+  
+  # Message personnalisé
+  rubuta "Sannu " + sunan + " daga " + gari + "!"
+kare
+\end{lstlisting}
+
+\subsection{Exercices}
+
+\textbf{Exercice 1 : Carte de visite}
+Créez un programme qui affiche vos informations personnelles :
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa sunan = "[Votre nom]"
+  naɗa shekarun = [Votre âge]
+  naɗa gari = "[Votre ville]"
+  naɗa aiki = "[Votre profession]"
+  
+  rubuta "=================="
+  rubuta "KATIN ZIYARA"
+  rubuta "=================="
+  rubuta "Suna: " + sunan
+  rubuta "Shekaru: " + shekarun
+  rubuta "Gari: " + gari
+  rubuta "Aiki: " + aiki
+  rubuta "=================="
+kare
+\end{lstlisting}
+
+\newpage
+
+\section{Opérations Mathématiques}
+
+Dabara supporte les opérations arithmétiques de base.
+
+\subsection{Les quatre opérations}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cll}
+\toprule
+Opération & Symbole & Exemple \\
+\midrule
+Addition & + & \texttt{5 + 3 = 8} \\
+Soustraction & - & \texttt{10 - 4 = 6} \\
+Multiplication & * & \texttt{6 * 7 = 42} \\
+Division & / & \texttt{20 / 4 = 5} \\
+\bottomrule
+\end{tabular}
+\caption{Opérateurs arithmétiques}
+\end{table}
+
+\subsection{Exemples d'opérations}
+
+\subsubsection{Calculs simples}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Opérations de base
+  naɗa jimla = 15 + 25
+  naɗa bambanci = 50 - 18
+  naɗa ninka = 8 * 7
+  naɗa raba = 64 / 8
+  
+  rubuta "15 + 25 = " + jimla
+  rubuta "50 - 18 = " + bambanci
+  rubuta "8 * 7 = " + ninka
+  rubuta "64 / 8 = " + raba
+kare
+\end{lstlisting}
+
+\subsubsection{Calculs avec variables}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Calcul de budget
+  naɗa kudin_littafi = 500
+  naɗa kudin_alkalam = 150
+  naɗa kudin_jaka = 1200
+  
+  naɗa jimlar_kudi = kudin_littafi + kudin_alkalam + kudin_jaka
+  
+  rubuta "Kudin littafi: " + kudin_littafi
+  rubuta "Kudin alkalam: " + kudin_alkalam
+  rubuta "Kudin jaka: " + kudin_jaka
+  rubuta "Jimlar kudi: " + jimlar_kudi
+kare
+\end{lstlisting}
+
+\subsection{Priorité des opérations}
+
+Comme en mathématiques traditionnelles, la multiplication et la division sont prioritaires sur l'addition et la soustraction :
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Sans parenthèses : multiplication d'abord
+  naɗa a = 10 + 5 * 2  # = 20 (pas 30)
+  rubuta a
+  
+  # Avec parenthèses : changement de priorité
+  naɗa b = (10 + 5) * 2  # = 30
+  rubuta b
+kare
+\end{lstlisting}
+
+\subsection{Applications pratiques}
+
+\subsubsection{Calculateur de moyenne}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Notes de trois examens
+  naɗa daraja1 = 85
+  naɗa daraja2 = 92
+  naɗa daraja3 = 78
+  
+  # Calcul de la moyenne
+  naɗa jimla = daraja1 + daraja2 + daraja3
+  naɗa adadin = 3
+  naɗa tsaka_tsaki = jimla / adadin
+  
+  rubuta "Darajomi:"
+  rubuta "Daraja 1: " + daraja1
+  rubuta "Daraja 2: " + daraja2
+  rubuta "Daraja 3: " + daraja3
+  rubuta "Tsaka-tsaki: " + tsaka_tsaki
+kare
+\end{lstlisting}
+
+\subsubsection{Convertisseur de devises}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Conversion Franc CFA → Euro (taux approximatif)
+  naɗa kudi_cfa = 50000
+  naɗa mai_canji = 0.0015  # 1 CFA = 0.0015 €
+  
+  naɗa kudi_euro = kudi_cfa * mai_canji
+  
+  rubuta kudi_cfa + " CFA = " + kudi_euro + " €"
+kare
+\end{lstlisting}
+
+\subsection{Gestion des erreurs}
+
+Attention à la division par zéro :
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa a = 10
+  naɗa b = 0
+  
+  # Ceci générera une erreur
+  # naɗa sakamako = a / b
+  
+  # Vérification avant division
+  idan b != 0 {
+    naɗa sakamako = a / b
+    rubuta sakamako
+  } amma {
+    rubuta "Ba za a iya raba da sifili ba"
+  }
+kare
+\end{lstlisting}
+
+\newpage
+
+\section{Conditions et Logique}
+
+Les structures conditionnelles permettent à votre programme de prendre des décisions.
+
+\subsection{Structure conditionnelle de base}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa shekarun = 18
+  
+  idan shekarun >= 18 {
+    rubuta "Kuna yawa don shiga"
+  } amma {
+    rubuta "Ba ku yawa a halin yanzu"
+  }
+kare
+\end{lstlisting}
+
+\subsection{Opérateurs de comparaison}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cll}
+\toprule
+Opérateur & Signification & Exemple \\
+\midrule
+== & Égal à & \texttt{a == b} \\
+!= & Différent de & \texttt{a != b} \\
+< & Inférieur à & \texttt{a < b} \\
+> & Supérieur à & \texttt{a > b} \\
+<= & Inférieur ou égal & \texttt{a <= b} \\
+>= & Supérieur ou égal & \texttt{a >= b} \\
+\bottomrule
+\end{tabular}
+\caption{Opérateurs de comparaison}
+\end{table}
+
+\subsection{Conditions multiples}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa daraja = 85
+  
+  idan daraja >= 90 {
+    rubuta "Grade A - Kyau sosai!"
+  } ammaina daraja >= 80 {
+    rubuta "Grade B - Kyau!"
+  } ammaina daraja >= 70 {
+    rubuta "Grade C - Yana da kyau"
+  } amma {
+    rubuta "Grade D - Yana bukata kokarin"
+  }
+kare
+\end{lstlisting}
+
+\subsection{Conditions imbriquées}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa shekarun = 25
+  naɗa daure = gaskiya
+  
+  idan shekarun >= 18 {
+    idan daure == gaskiya {
+      rubuta "Kuna yawa don aure"
+    } amma {
+      rubuta "Kuna bukata daure"
+    }
+  } amma {
+    rubuta "Ba ku yawa a halin yanzu"
+  }
+kare
+\end{lstlisting}
+
+\subsection{Applications pratiques}
+
+\subsubsection{Calculateur d'IMC}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Données de l'utilisateur
+  naɗa takaici = 1.75  # en mètres
+  naɗa nauyi = 70      # en kg
+  
+  # Calcul de l'IMC
+  naɗa imc = nauyi / (takaici * takaici)
+  
+  rubuta "Takaicinku: " + takaici + "m"
+  rubuta "Nauyinku: " + nauyi + "kg"
+  rubuta "IMC: " + imc
+  
+  # Interprétation
+  idan imc < 18.5 {
+    rubuta "Kuna takaici - Ku kara cin abinci"
+  } ammaina imc < 25 {
+    rubuta "Nauyinku yana da kyau"
+  } ammaina imc < 30 {
+    rubuta "Kuna samu wani nauyi - Ku yi wasan jiki"
+  } amma {
+    rubuta "Nauyinku yana da yawa - Ku tattauna likita"
+  }
+kare
+\end{lstlisting}
+
+\subsubsection{Quiz simple}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  rubuta "Tambaya: Ke ainihin garin Nigeria?"
+  rubuta "A) Kano  B) Abuja  C) Lagos"
+  naɗa amsa = karɓa()
+  
+  idan amsa == "B" ama amsa == "b" {
+    rubuta "Da kyau! Abuja ne ainihin garin Nigeria."
+  } amma {
+    rubuta "Amsa ba daidai ba. Abuja ne ainihin garin Nigeria."
+  }
+kare
+\end{lstlisting}
+
+\newpage
+
+\section{Fonctions et Modularité}
+
+Les fonctions permettent de réutiliser du code et d'organiser votre programme.
+
+\subsection{Définition et appel de fonctions}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Définition d'une fonction
+  aiki lissafi(a, b) {
+    mayar a + b
+  }
+  
+  # Appel de la fonction
+  naɗa sakamakon = lissafi(10, 5)
+  rubuta "10 + 5 = " + sakamakakon
+kare
+\end{lstlisting}
+
+\subsection{Paramètres et valeurs de retour}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Fonction avec plusieurs paramètres
+  aiki daraja(tsakaci, adadin) {
+    mayar tsakaci / adadin
+  }
+  
+  # Fonction qui ne retourne rien
+  aiki gaya(sako) {
+    rubuta sako
+  }
+  
+  # Utilisation
+  naɗa tsaka_tsaki = daraja(100, 4)
+  gaya("Tsaka-tsakin lambar shine: " + tsaka_tsaki)
+kare
+\end{lstlisting}
+
+\subsection{Portée des variables}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Variable globale
+  naɗa x = 100
+  
+  aiki gwaji() {
+    # Variable locale
+    naɗa x = 999
+    mayar x
+  }
+  
+  naɗa sakamako = gwaji()
+  
+  rubuta "x na waje: " + x          # 100
+  rubuta "x na ciki: " + sakamako   # 999
+kare
+\end{lstlisting}
+
+\subsection{Fonctions récursives}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Calcul du factoriel
+  aiki factorial(n) {
+    idan n == 0 {
+      mayar 1
+    } amma {
+      mayar n * factorial(n - 1)
+    }
+  }
+  
+  naɗa sakamako = factorial(5)
+  rubuta "5! = " + sakamako  # 120
+kare
+\end{lstlisting}
+
+\subsection{Bibliothèque de fonctions utiles}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Fonctions mathématiques
+  aiki kashi(daraja, adadin) {
+    mayar (daraja * 100) / adadin
+  }
+  
+  aiki cikakkiya(a, b) {
+    mayar (a * b) / 100
+  }
+  
+  # Fonctions de texte
+  aiki tsawo(jimla) {
+    # Implémentation simplifiée
+    mayar 0  # À remplacer par comptage réel
+  }
+  
+  # Utilisation
+  naɗa adadin_darajomi = 50
+  naɗa darajomi_samun = 42
+  naɗa kashin_daraja = kashi(darajomi_samun, adadin_darajomi)
+  
+  rubuta "Kashin daraja: " + kashin_daraja + "%"
+kare
+\end{lstlisting}
+
+\newpage
+
+\section{Interaction avec l'Utilisateur}
+
+Rendez vos programmes interactifs avec la lecture d'entrées utilisateur.
+
+\subsection{Lecture d'entrées avec \texttt{karɓa}}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  rubuta "Suna nawa suke?"
+  naɗa sunan = karɓa()
+  
+  rubuta "Shekaru nawa kuke?"
+  naɗa shekarun = karɓa()
+  
+  rubuta "Sannu " + sunan + "! Kuna shekaru " + shekarun
+kare
+\end{lstlisting}
+
+\subsection{Validation des entrées}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  rubuta "Shigar da lambar shekarunku:"
+  naɗa shekarun = karɓa()
+  
+  # Conversion et validation
+  idan shekarun >= 0 ama shekarun <= 150 {
+    rubuta "Shekarunku shine: " + shekarun
+  } amma {
+    rubuta "Shigarwar ba daidai ba"
+  }
+kare
+\end{lstlisting}
+
+\subsection{Menus interactifs}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  rubuta "==== MENU ===="
+  rubuta "1. Lissafi"
+  rubuta "2. Gayyata"
+  rubuta "3. Fitowa"
+  rubuta "Zabi:"
+  
+  naɗa zabin = karɓa()
+  
+  idan zabin == "1" {
+    rubuta "Kuna cikin lissafin..."
+  } ammaina zabin == "2" {
+    rubuta "Kuna cikin gayyatar..."
+  } ammaina zabin == "3" {
+    rubuta "Mai godiya!"
+  } amma {
+    rubuta "Zabin ba daidai ba"
+  }
+kare
+\end{lstlisting}
+
+\subsection{Applications pratiques}
+
+\subsubsection{Calculatrice interactive}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  rubuta "==== CALCULATRICE ===="
+  rubuta "Shigar da lambar farko:"
+  naɗa a = karɓa()
+  
+  rubuta "Shigar da lambar biyu:"
+  naɗa b = karɓa()
+  
+  rubuta "Zabi aiki (+, -, *, /):"
+  naɗa aiki = karɓa()
+  
+  idan aiki == "+" {
+    naɗa sakamako = a + b
+    rubuta "Sakamako: " + sakamako
+  } ammaina aiki == "-" {
+    naɗa sakamako = a - b
+    rubuta "Sakamako: " + sakamako
+  } ammaina aiki == "*" {
+    naɗa sakamako = a * b
+    rubuta "Sakamako: " + sakamako
+  } ammaina aiki == "/" {
+    idan b != 0 {
+      naɗa sakamako = a / b
+      rubuta "Sakamako: " + sakamako
+    } amma {
+      rubuta "Ba za a iya raba da sifili ba"
+    }
+  } amma {
+    rubuta "Aikin ba daidai ba"
+  }
+kare
+\end{lstlisting}
+
+\newpage
+
+\section{Collections et Listes}
+
+Organisez vos données avec des collections.
+
+\subsection{Création de listes}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Liste de textes
+  naɗa sunaye = ["Ahmad", "Fatima", "Musa", "Aisha"]
+  
+  # Liste de nombres
+  naɗa lambobi = [10, 20, 30, 40, 50]
+  
+  # Liste mixte
+  naɗa abubuwa = ["Littafi", 25, gaskiya, "Pen"]
+  
+  # Liste vide
+  naɗa faduwa = []
+  
+  rubuta sunaye
+  rubuta lambobi
+kare
+\end{lstlisting}
+
+\subsection{Accès aux éléments}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa sunaye = ["Ahmad", "Fatima", "Musa", "Aisha"]
+  
+  # Accès par index (à partir de 0)
+  rubuta "Na farko: " + sunaye[0]    # Ahmad
+  rubuta "Na biyu: " + sunaye[1]     # Fatima
+  rubuta "Na ƙarshe: " + sunaye[3]   # Aisha
+  
+  # Longueur de la liste
+  rubuta "Adadin sunaye: " + sunaye.tsawo()
+kare
+\end{lstlisting}
+
+\subsection{Boucles sur les listes}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa sunaye = ["Ahmad", "Fatima", "Musa", "Aisha"]
+  
+  # Boucle for-each
+  don suna a sunaye {
+    rubuta "Suna: " + suna
+  }
+  
+  # Boucle avec index
+  naɗa i = 0
+  don suna a sunaye {
+    rubuta "Wanda ke " + i + ": " + suna
+    i = i + 1
+  }
+kare
+\end{lstlisting}
+
+\subsection{Opérations sur les listes}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa lambobi = [10, 20, 30, 40]
+  
+  # Ajouter un élément
+  lambobi.kara(50)
+  rubuta lambobi  # [10, 20, 30, 40, 50]
+  
+  # Supprimer un élément
+  lambobi.cire(0)  # Supprime le premier élément
+  rubuta lambobi  # [20, 30, 40, 50]
+  
+  # Trouver un élément
+  naɗa akwai = lambobi.kunshe(30)
+  rubuta "Akwai 30? " + akwai  # gaskiya
+kare
+\end{lstlisting}
+
+\subsection{Applications pratiques}
+
+\subsubsection{Gestionnaire de contacts}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Liste de contacts
+  naɗa sunaye = ["Ahmad Ibrahim", "Fatima Ali", "Musa Yusuf"]
+  naɗa wayoyi = ["0901234567", "0902345678", "0903456789"]
+  
+  rubuta "==== LAMBAR WAYOYI ===="
+  
+  # Afficher tous les contacts
+  don i a sunaye.tsawo() {
+    rubuta (i + 1) + ". " + sunaye[i] + " - " + wayoyi[i]
+  }
+  
+  # Recherche de contact
+  rubuta "Bincika suna:"
+  naɗa bincike = karɓa()
+  
+  don i a sunaye.tsawo() {
+    idan sunaye[i].kunshe(bincike) {
+      rubuta "An samo: " + sunaye[i] + " - " + wayoyi[i]
+    }
+  }
+kare
+\end{lstlisting}
+
+\newpage
+
+\section{Projets Pratiques}
+
+Appliquons nos connaissances à des projets concrets.
+
+\subsection{Projet 1 : Gestionnaire de Budget Personnel}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Variables globales
+  naɗa kudin_shiga = []
+  naɗa kudin_fitowa = []
+  naɗa bayanin_shiga = []
+  naɗa bayanin_fitowa = []
+  
+  # Fonction pour ajouter revenu
+  aiki kara_shiga(kudi, bayani) {
+    kudin_shiga.kara(kudi)
+    bayanin_shiga.kara(bayani)
+  }
+  
+  # Fonction pour ajouter dépense
+  aiki kara_fitowa(kudi, bayani) {
+    kudin_fitowa.kara(kudi)
+    bayanin_fitowa.kara(bayani)
+  }
+  
+  # Fonction pour calculer total
+  aiki jimla_jerina(jerin) {
+    naɗa jimla = 0
+    don kudi a jerin {
+      jimla = jimla + kudi
+    }
+    mayar jimla
+  }
+  
+  # Programme principal
+  rubuta "==== MAJEFIN KUDI ===="
+  
+  # Ajout de revenus
+  kara_shiga(50000, "Mai")
+  kara_shiga(25000, "Kasuwanci")
+  
+  # Ajout de dépenses
+  kara_fitowa(15000, "Abinci")
+  kara_fitowa(8000, "Transport")
+  kara_fitowa(5000, "Wasanni")
+  
+  # Calculs
+  naɗa jimlar_shiga = jimla_jerina(kudin_shiga)
+  naɗa jimlar_fitowa = jimla_jerina(kudin_fitowa)
+  naɗa sauƙin_kudi = jimlar_shiga - jimlar_fitowa
+  
+  # Affichage des résultats
+  rubuta "Jimlar shiga: " + jimlar_shiga
+  rubuta "Jimlar fitowa: " + jimlar_fitowa
+  rubuta "Sauƙin kudi: " + sauƙin_kudi
+  
+  # Analyse
+  idan sauƙin_kudi > 0 {
+    rubuta "Masha Allah! Kuna samun sauƙin kudi."
+  } amma {
+    rubuta "Yi hankali! Kuna rashin kudi."
+  }
+kare
+\end{lstlisting}
+
+\subsection{Projet 2 : Quiz Multilingue}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Questions et réponses
+  naɗa tambayoyi = [
+    "Ke ainihin garin Nigeria?",
+    "Ƙungiyar wasan kwallon kafa ta Nigeria ta fara a shekara?",
+    "Yaushe aka samar da al'umma ta karo miliyan daya a Nigeria?"
+  ]
+  
+  naɗa amsoshi = [
+    ["A) Kano", "B) Abuja", "C) Lagos"],
+    ["A) 1945", "B) 1960", "C) 1988"],
+    ["A) 1960", "B) 1980", "C) 2000"]
+  ]
+  
+idai_daidai = ["B", "A", "C"]
+  
+  naɗa lambar_daraja = 0
+  
+  # Fonction pour poser une question
+  aiki tambaya(namba) {
+    rubuta (namba + 1) + ". " + tambayoyi[namba]
+    
+    # Afficher les options
+    don i a 3 {
+      rubuta amsoshi[namba][i]
+    }
+    
+    rubuta "Amsa:"
+    naɗa amsa = karɓa()
+    
+    # Vérifier la réponse
+    idan amsa == amsoshi_daidai[namba] {
+      rubuta "✓ Da kyau!"
+      lambar_daraja = lambar_daraja + 1
+    } amma {
+      rubuta "✗ Ba daidai ba. Amsa daidai shine: " + amsoshi_daidai[namba]
+    }
+    
+    rubuta "--------------------"
+  }
+  
+  # Programme principal
+  rubuta "==== TAMBOYIN TARAYYA ===="
+  rubuta "Ƙara ilimi game da tarayya ta Nigeria"
+  rubuta "================================"
+  
+  # Poser toutes les questions
+  tambaya(0)
+  tambaya(1)
+  tambaya(2)
+  
+  # Afficher le résultat final
+  rubuta "==== SAKAMAKO ===="
+  rubuta "Darajokanku: " + lambar_daraja + "/3"
+  
+  idan lambar_daraja == 3 {
+    rubuta "Kyau sosai! Kuna da ilmi mai zurfi!"
+  } ammaina lambar_daraja == 2 {
+    rubuta "Kyau! Kuna da ilmi mai kyau."
+  } ammaina lambar_daraja == 1 {
+    rubuta "Yana da kyau. Kokarin kara koyo."
+  } amma {
+    rubuta "Yi kokari. Karatu yana da mahimmanci."
+  }
+  
+  rubuta "Mai godiya da shirin!"
+kare
+
+\end{lstlisting}
+
+\newpage
+
+\section{Commandes Utiles et Références}
+
+\subsection{Référence rapide des mots-clés}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Mot-clé} & \textbf{Signification} & \textbf{Utilisation} \\
+\midrule
+\texttt{fara} & Commencer & Début de programme \\
+\texttt{kare} & Terminer & Fin de programme \\
+\texttt{naɗa} & Créer & Déclaration de variable \\
+\texttt{rubuta} & Écrire & Affichage \\
+\texttt{karɓa} & Recevoir & Lecture d'entrée \\
+\texttt{idan} & Si & Condition \\
+\texttt{amma} & Sinon & Alternative \\
+\texttt{ammaina} & Sinon si & Condition multiple \\
+\texttt{aiki} & Travail & Définition de fonction \\
+\texttt{mayar} & Retourner & Valeur de retour \\
+\texttt{don} & Pour & Boucle \\
+\texttt{gaskiya} & Vrai & Booléen positif \\
+\texttt{karya} & Faux & Booléen négatif \\
+\bottomrule
+\end{tabular}
+\caption{Mots-clés Dabara}
+\end{table}
+
+\subsection{Opérateurs}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Opérateur} & \textbf{Utilisation} \\
+\midrule
+\texttt{+} & Addition, concaténation \\
+\texttt{-} & Soustraction \\
+\texttt{*} & Multiplication \\
+\texttt{/} & Division \\
+\texttt{=} & Affectation \\
+\texttt{==} & Égalité \\
+\texttt{!=} & Différence \\
+\texttt{<} & Inférieur \\
+\texttt{>} & Supérieur \\
+\texttt{<=} & Inférieur ou égal \\
+\texttt{>=} & Supérieur ou égal \\
+\bottomrule
+\end{tabular}
+\caption{Opérateurs Dabara}
+\end{table}
+
+\subsection{Commandes du terminal}
+
+\begin{lstlisting}[language=bash]
+# Exécuter un programme
+$ dabara nom_du_fichier.ha
+
+# Mode debug (affiche tokens et AST)
+$ export DABARA_DEBUG=1 && dabara programme.ha
+
+# Tester tous les exemples
+$ ./test_examples.sh
+
+# Compiler Dabara
+$ cargo build --release
+
+# Installer localement
+$ cargo install --path .
+\end{lstlisting}
+
+\subsection{Structure d'un programme complet}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  # Zone d'importation (futures versions)
+  # naɗa std = karɓa("std")
+  
+  # Déclarations de variables globales
+  naɗa version = "1.0"
+  naɗa mai_ƙirƙira = "Votre nom"
+  
+  # Définition des fonctions
+  aiki tsawo(jimla) {
+    # Implémentation
+    mayar 0
+  }
+  
+  # Programme principal
+  rubuta "Dabara Version " + version
+  rubuta "Ƙirƙirar: " + mai_ƙirƙira
+  
+  # Votre code ici...
+  
+kare
+\end{lstlisting}
+
+\newpage
+
+\section{Conclusion et Perspectives}
+
+\subsection*{Félicitations !}
+
+Vous venez de terminer votre initiation à la programmation avec Dabara. 🎉
+
+\subsection*{Ce que vous avez appris}
+
+\begin{itemize}
+    \item Installation et configuration de l'environnement
+    \item Variables, types de données et affichage
+    \item Opérations mathématiques
+    \item Structures conditionnelles
+    \item Fonctions et modularité
+    \item Interaction avec l'utilisateur
+    \item Collections et listes
+    \item Développement de projets complets
+\end{itemize}
+
+\subsection*{Prochaines étapes}
+
+\subsubsection{Approfondissement}
+
+\begin{itemize}
+    \item Explorer les exemples dans le dossier \texttt{examples/}
+    \item Consulter la documentation complète
+    \item Participer à la communauté Dabara
+    \item Contribuer au développement du langage
+\end{itemize}
+
+\subsubsection{Projets à réaliser}
+
+\begin{itemize}
+    \item Calculatrice scientifique
+    \item Gestionnaire de tâches
+    \item Jeu de devinettes
+    \item Application de gestion de contacts
+    \item Système de vote électronique
+\end{itemize}
+
+\subsubsection{Apprentissage avancé}
+
+\begin{itemize}
+    \item Algorithmes et structures de données
+    \item Programmation orientée objet
+    \item Gestion de fichiers
+    \item Interfaces graphiques
+    \item Déploiement d'applications
+\end{itemize}
+
+\subsection*{Ressources}
+
+\subsubsection{Documentation officielle}
+
+\begin{itemize}
+    \item \href{https://github.com/votre-compte/dabara}{GitHub Repository}
+    \item \href{https://dabara-lang.org/docs}{Documentation officielle}
+    \item \href{https://discord.gg/dabara}{Serveur Discord}
+\end{itemize}
+
+\subsubsection{Communauté}
+
+\begin{itemize}
+    \item Partagez vos créations sur GitHub
+    \item Posez des questions dans les Issues
+    \item Contribuez aux traductions
+    \item Aidez les nouveaux venus
+\end{itemize}
+
+\subsection*{Message final}
+
+La programmation est un voyage, pas une destination. Chaque ligne de code que vous écrivez vous rend plus compétent. Continuez à explorer, à expérimenter et à créer.
+
+\vspace{1cm}
+
+\begin{center}
+\textbf{Barka da zuwa masana kimiyya!} \\
+\textit{Bienvenue dans le monde merveilleux de la science informatique !}
+\end{center}
+
+\vspace{2cm}
+
+\begin{flushright}
+\textit{Ce guide a été créé avec passion} \\
+\textit{pour rendre la programmation accessible à tous} \\
+\textit{dans leur langue maternelle.}
+\end{flushright}
+
+\newpage
+
+\section*{Annexe : Solutions des exercices}
+
+\subsection*{Solution de l'exercice 1 (Carte de visite)}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  naɗa sunan = "Ahmad Ibrahim"
+  naɗa shekarun = 28
+  naɗa gari = "Kano"
+  naɗa aiki = "Mai shirye-shirye"
+  naɗa email = "ahmad@example.com"
+  
+  rubuta "=================="
+  rubuta "KATIN ZIYARA"
+  rubuta "=================="
+  rubuta "Suna: " + sunan
+  rubuta "Shekaru: " + shekarun
+  rubuta "Gari: " + gari
+  rubuta "Aiki: " + aiki
+  rubuta "Email: " + email
+  rubuta "=================="
+kare
+\end{lstlisting}
+
+\subsection*{Solution bonus : Programme interactif}
+
+\begin{lstlisting}[language=Dabara]
+fara
+  rubuta "==== SHIRIN BAYANI ===="
+  
+  rubuta "Suna nawa suke?"
+  naɗa sunan = karɓa()
+  
+  rubuta "Shekaru nawa kuke?"
+  naɗa shekarun = karɓa()
+  
+  rubuta "A wane gari kuke zaune?"
+  naɗa gari = karɓa()
+  
+  rubuta "Me aiki kuke yi?"
+  naɗa aiki = karɓa()
+  
+  # Affichage de la carte
+  rubuta ""
+  rubuta "=================="
+  rubuta "BAYANANKU"
+  rubuta "=================="
+  rubuta "Suna: " + sunan
+  rubuta "Shekaru: " + shekarun
+  rubuta "Gari: " + gari
+  rubuta "Aiki: " + aiki
+  rubuta "=================="
+  rubuta "Mai godiya da shirin!"
+kare
+\end{lstlisting}
+
+\end{document}

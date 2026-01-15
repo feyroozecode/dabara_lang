@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dabara : Guide Rapide de Programmation en Hausa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .cover {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        
+        h3 {
+            color: #764ba2;
+            margin-top: 25px;
+        }
+        
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .keyword {
+            color: #ff79c6;
+        }
+        
+        .string {
+            color: #f1fa8c;
+        }
+        
+        .comment {
+            color: #6272a4;
+        }
+        
+        .number {
+            color: #bd93f9;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+        
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .table th {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .exercise {
+            background-color: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .solution {
+            background-color: #f0f8e8;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+            display: none;
+        }
+        
+        .toggle-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .toggle-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .toc {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: #667eea;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            
+            .toggle-btn {
+                display: none;
+            }
+            
+            .solution {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cover">
+        <h1>DABARA</h1>
+        <h2>Guide Rapide de Programmation en Hausa</h2>
+        <p>Version 1.0 • 45 pages</p>
+        <p>Apprenez à programmer dans votre langue maternelle</p>
+    </div>
+
+    <div class="toc">
+        <h3>Sommaire</h3>
+        <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#installation">1. Installation et Configuration</a></li>
+            <li><a href="#fondamentaux">2. Les Fondamentaux</a></li>
+            <li><a href="#mathematiques">3. Opérations Mathématiques</a></li>
+            <li><a href="#conditions">4. Conditions et Logique</a></li>
+            <li><a href="#fonctions">5. Fonctions et Modularité</a></li>
+            <li><a href="#interaction">6. Interaction avec l'Utilisateur</a></li>
+            <li><a href="#collections">7. Collections et Listes</a></li>
+            <li><a href="#projets">8. Projets Pratiques</a></li>
+            <li><a href="#references">9. Références et Commandes</a></li>
+            <li><a href="#conclusion">10. Conclusion</a></li>
+        </ul>
+    </div>
+
+    <h2 id="introduction">Introduction : Bienvenue dans Dabara</h2>
+    
+    <p><strong>Dabara</strong> est un langage de programmation innovant qui rompt avec la tradition anglo-saxonne dominante dans le monde de l'informatique. Inspiré par le haoussa, l'une des langues les plus parlées en Afrique, Dabara offre une alternative multiculturelle à l'apprentissage de la programmation.</p>
+
+    <h3>Pourquoi Dabara ?</h3>
+    <ul>
+        <li><strong>Accessibilité linguistique</strong> : Programmation en haoussa et français</li>
+        <li><strong>Culture locale</strong> : Respect des traditions linguistiques africaines</li>
+        <li><strong>Apprentissage intuitif</strong> : Syntaxe proche du langage naturel</li>
+        <li><strong>Innovation pédagogique</strong> : Nouvelle approche de l'enseignement</li>
+    </ul>
+
+    <h3>Ce que vous allez apprendre</h3>
+    <ol>
+        <li>Installation et configuration</li>
+        <li>Variables et types de données</li>
+        <li>Opérations mathématiques</li>
+        <li>Structures conditionnelles</li>
+        <li>Fonctions et modularité</li>
+        <li>Interaction avec l'utilisateur</li>
+        <li>Collections et listes</li>
+        <li>Projets pratiques</li>
+    </ol>
+
+    <h2 id="installation">1. Installation et Configuration</h2>
+    
+    <p>Avant de commencer à programmer, configurons votre environnement de développement.</p>
+
+    <h3>Méthodes d'installation</h3>
+
+    <h4>Méthode 1 : Via Cargo (Recommandée)</h4>
+    <p>Si vous avez Rust installé :</p>
+    <div class="code-block">
+# Installer Dabara depuis le dépôt officiel<br>
+cargo install --git https://github.com/votre-compte/dabara<br><br>
+# Vérifier l'installation<br>
+dabara --version
+    </div>
+
+    <h4>Méthode 2 : Compilation depuis les sources</h4>
+    <div class="code-block">
+# Cloner le dépôt<br>
+git clone https://github.com/votre-compte/dabara<br>
+cd dabara<br><br>
+# Compiler<br>
+cargo build --release<br><br>
+# Copier l'exécutable dans votre PATH<br>
+sudo cp target/release/dabara /usr/local/bin/
+    </div>
+
+    <h3>Vérification de l'installation</h3>
+    <p>Testons que tout fonctionne correctement :</p>
+    <div class="code-block">
+# Créer un fichier test<br>
+<span class="keyword">echo</span> '<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Barka da zuwa Dabara!"</span><br>
+<span class="keyword">kare</span>' &gt; test.ha<br><br>
+# Exécuter le programme<br>
+<span class="keyword">dabara</span> test.ha
+    </div>
+    <p>Vous devriez voir : <code>Barka da zuwa Dabara!</code></p>
+
+    <h3>Structure d'un programme Dabara</h3>
+    <p>Chaque programme Dabara suit cette structure :</p>
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="comment"># Votre code ici</span><br>
+<span class="keyword">kare</span>
+    </div>
+    
+    <dl>
+        <dt><code>fara</code></dt>
+        <dd>Marque le début du programme (signifie "commencer")</dd>
+        <dt><code>kare</code></dt>
+        <dd>Marque la fin du programme (signifie "terminer")</dd>
+        <dt>Indentation</dt>
+        <dd>Le code est décalé vers la droite pour la lisibilité</dd>
+    </dl>
+
+    <h2 id="fondamentaux">2. Les Fondamentaux</h2>
+    
+    <p>Commençons par les concepts de base de la programmation.</p>
+
+    <h3>Variables et déclaration</h3>
+    <p>Une variable est comme une boîte qui contient une valeur. Nous utilisons le mot-clé <code>naɗa</code> pour créer des variables.</p>
+    
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="comment"># Déclaration de variables</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> sunan = <span class="string">"Ahmad"</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> shekarun = <span class="number">25</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> aiki = <span class="string">"Mai shirye-shirye"</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Affichage des variables</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> sunan<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> shekarun<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> aiki<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h3>Types de données</h3>
+    <p>Dabara supporte plusieurs types de données :</p>
+
+    <h4>Textes (Chaînes de caractères)</h4>
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> sunan = <span class="string">"Fatima"</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> salutation = <span class="string">"Sannu Duniya!"</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> adresse = <span class="string">"Niamey, Niger"</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> sunan<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> salutation<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> adresse<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h4>Nombres</h4>
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> lambar = <span class="number">42</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> temperature = <span class="number">-5</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> prix = <span class="number">1250</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> lambar<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> temperature<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> prix<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h4>Booléens (Vrai/Faux)</h4>
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> gaskiya_ne = <span class="keyword">gaskiya</span>  <span class="comment"># vrai</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> karya_ne = <span class="keyword">karya</span>      <span class="comment"># faux</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> gaskiya_ne<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> karya_ne<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h3>Affichage avec <code>rubuta</code></h3>
+    <p>Le mot-clé <code>rubuta</code> permet d'afficher du texte ou des variables à l'écran.</p>
+    
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="comment"># Afficher du texte simple</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Barka da safiya!"</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Afficher une variable</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> sunan = <span class="string">"Musa"</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> sunan<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Afficher plusieurs éléments</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> shekarun = <span class="number">30</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Sunansa: "</span> + sunan<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Shekarsa: "</span> + shekarun<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h3>Concaténation de textes</h3>
+    <p>Vous pouvez combiner des textes et des variables avec l'opérateur <code>+</code> :</p>
+    
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> sunan = <span class="string">"Aisha"</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> gari = <span class="string">"Zinder"</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Concaténation simple</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Sunanta: "</span> + sunan<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Garinta: "</span> + gari<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Message personnalisé</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Sannu "</span> + sunan + <span class="string">" daga "</span> + gari + <span class="string">"!"</span><br>
+<span class="keyword">kare</span>
+    </div>
+
+    <div class="exercise">
+        <h4>Exercice 1 : Carte de visite</h4>
+        <p>Créez un programme qui affiche vos informations personnelles :</p>
+        <button class="toggle-btn" onclick="toggleSolution('sol1')">Voir la solution</button>
+        <div id="sol1" class="solution">
+            <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> sunan = <span class="string">"[Votre nom]"</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> shekarun = <span class="number">[Votre âge]</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> gari = <span class="string">"[Votre ville]"</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> aiki = <span class="string">"[Votre profession]"</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"=================="</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"KATIN ZIYARA"</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"=================="</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Suna: "</span> + sunan<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Shekaru: "</span> + shekarun<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Gari: "</span> + gari<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Aiki: "</span> + aiki<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"=================="</span><br>
+<span class="keyword">kare</span>
+            </div>
+        </div>
+    </div>
+
+    <h2 id="mathematiques">3. Opérations Mathématiques</h2>
+    
+    <p>Dabara supporte les opérations arithmétiques de base.</p>
+
+    <h3>Les quatre opérations</h3>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Opération</th>
+                <th>Symbole</th>
+                <th>Exemple</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Addition</td>
+                <td><code>+</code></td>
+                <td><code>5 + 3 = 8</code></td>
+            </tr>
+            <tr>
+                <td>Soustraction</td>
+                <td><code>-</code></td>
+                <td><code>10 - 4 = 6</code></td>
+            </tr>
+            <tr>
+                <td>Multiplication</td>
+                <td><code>*</code></td>
+                <td><code>6 * 7 = 42</code></td>
+            </tr>
+            <tr>
+                <td>Division</td>
+                <td><code>/</code></td>
+                <td><code>20 / 4 = 5</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Exemples d'opérations</h3>
+    
+    <h4>Calculs simples</h4>
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="comment"># Opérations de base</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> jimla = <span class="number">15</span> + <span class="number">25</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> bambanci = <span class="number">50</span> - <span class="number">18</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> ninka = <span class="number">8</span> * <span class="number">7</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> raba = <span class="number">64</span> / <span class="number">8</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"15 + 25 = "</span> + jimla<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"50 - 18 = "</span> + bambanci<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"8 * 7 = "</span> + ninka<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"64 / 8 = "</span> + raba<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h4>Calculs avec variables</h4>
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="comment"># Calcul de budget</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> kudin_littafi = <span class="number">500</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> kudin_alkalam = <span class="number">150</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> kudin_jaka = <span class="number">1200</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> jimlar_kudi = kudin_littafi + kudin_alkalam + kudin_jaka<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Kudin littafi: "</span> + kudin_littafi<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Kudin alkalam: "</span> + kudin_alkalam<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Kudin jaka: "</span> + kudin_jaka<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Jimlar kudi: "</span> + jimlar_kudi<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h2 id="conditions">4. Conditions et Logique</h2>
+    
+    <p>Les structures conditionnelles permettent à votre programme de prendre des décisions.</p>
+
+    <h3>Structure conditionnelle de base</h3>
+    
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> shekarun = <span class="number">18</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">idan</span> shekarun &gt;= <span class="number">18</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Kuna yawa don shiga"</span><br>
+&nbsp;&nbsp;} <span class="keyword">amma</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Ba ku yawa a halin yanzu"</span><br>
+&nbsp;&nbsp;}<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h3>Opérateurs de comparaison</h3>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Opérateur</th>
+                <th>Signification</th>
+                <th>Exemple</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>==</code></td>
+                <td>Égal à</td>
+                <td><code>a == b</code></td>
+            </tr>
+            <tr>
+                <td><code>!=</code></td>
+                <td>Différent de</td>
+                <td><code>a != b</code></td>
+            </tr>
+            <tr>
+                <td><code>&lt;</code></td>
+                <td>Inférieur à</td>
+                <td><code>a &lt; b</code></td>
+            </tr>
+            <tr>
+                <td><code>&gt;</code></td>
+                <td>Supérieur à</td>
+                <td><code>a &gt; b</code></td>
+            </tr>
+            <tr>
+                <td><code>&lt;=</code></td>
+                <td>Inférieur ou égal</td>
+                <td><code>a &lt;= b</code></td>
+            </tr>
+            <tr>
+                <td><code>&gt;=</code></td>
+                <td>Supérieur ou égal</td>
+                <td><code>a &gt;= b</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 id="fonctions">5. Fonctions et Modularité</h2>
+    
+    <p>Les fonctions permettent de réutiliser du code et d'organiser votre programme.</p>
+
+    <h3>Définition et appel de fonctions</h3>
+    
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="comment"># Définition d'une fonction</span><br>
+&nbsp;&nbsp;<span class="keyword">aiki</span> lissafi(a, b) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mayar</span> a + b<br>
+&nbsp;&nbsp;}<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Appel de la fonction</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> sakamakon = lissafi(<span class="number">10</span>, <span class="number">5</span>)<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"10 + 5 = "</span> + sakamakon<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h2 id="interaction">6. Interaction avec l'Utilisateur</h2>
+    
+    <p>Rendez vos programmes interactifs avec la lecture d'entrées utilisateur.</p>
+
+    <h3>Lecture d'entrées avec <code>karɓa</code></h3>
+    
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Suna nawa suke?"</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> sunan = <span class="keyword">karɓa</span>()<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Shekaru nawa kuke?"</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> shekarun = <span class="keyword">karɓa</span>()<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Sannu "</span> + sunan + <span class="string">"! Kuna shekaru "</span> + shekarun<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h2 id="collections">7. Collections et Listes</h2>
+    
+    <p>Organisez vos données avec des collections.</p>
+
+    <h3>Création de listes</h3>
+    
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="comment"># Liste de textes</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> sunaye = [<span class="string">"Ahmad"</span>, <span class="string">"Fatima"</span>, <span class="string">"Musa"</span>, <span class="string">"Aisha"</span>]<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Liste de nombres</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> lambobi = [<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>]<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> sunaye<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> lambobi<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h2 id="projets">8. Projets Pratiques</h2>
+    
+    <p>Appliquons nos connaissances à des projets concrets.</p>
+
+    <h3>Projet 1 : Gestionnaire de Budget Personnel</h3>
+    
+    <div class="code-block">
+<span class="keyword">fara</span><br>
+&nbsp;&nbsp;<span class="comment"># Variables globales</span><br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> kudin_shiga = []<br>
+&nbsp;&nbsp;<span class="keyword">naɗa</span> kudin_fitowa = []<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Fonction pour ajouter revenu</span><br>
+&nbsp;&nbsp;<span class="keyword">aiki</span> kara_shiga(kudi, bayani) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;kudin_shiga.<span class="keyword">kara</span>(kudi)<br>
+&nbsp;&nbsp;}<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Fonction pour ajouter dépense</span><br>
+&nbsp;&nbsp;<span class="keyword">aiki</span> kara_fitowa(kudi, bayani) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;kudin_fitowa.<span class="keyword">kara</span>(kudi)<br>
+&nbsp;&nbsp;}<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Ajout de revenus</span><br>
+&nbsp;&nbsp;kara_shiga(<span class="number">50000</span>, <span class="string">"Mai"</span>)<br>
+&nbsp;&nbsp;kara_shiga(<span class="number">25000</span>, <span class="string">"Kasuwanci"</span>)<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Ajout de dépenses</span><br>
+&nbsp;&nbsp;kara_fitowa(<span class="number">15000</span>, <span class="string">"Abinci"</span>)<br>
+&nbsp;&nbsp;kara_fitowa(<span class="number">8000</span>, <span class="string">"Transport"</span>)<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span class="comment"># Calculs et affichage</span><br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Jimlar shiga: "</span> + kudin_shiga<br>
+&nbsp;&nbsp;<span class="keyword">rubuta</span> <span class="string">"Jimlar fitowa: "</span> + kudin_fitowa<br>
+<span class="keyword">kare</span>
+    </div>
+
+    <h2 id="references">9. Références et Commandes Utiles</h2>
+    
+    <h3>Référence rapide des mots-clés</h3>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mot-clé</th>
+                <th>Signification</th>
+                <th>Utilisation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>fara</code></td>
+                <td>Commencer</td>
+                <td>Début de programme</td>
+            </tr>
+            <tr>
+                <td><code>kare</code></td>
+                <td>Terminer</td>
+                <td>Fin de programme</td>
+            </tr>
+            <tr>
+                <td><code>naɗa</code></td>
+                <td>Créer</td>
+                <td>Déclaration de variable</td>
+            </tr>
+            <tr>
+                <td><code>rubuta</code></td>
+                <td>Écrire</td>
+                <td>Affichage</td>
+            </tr>
+            <tr>
+                <td><code>karɓa</code></td>
+                <td>Recevoir</td>
+                <td>Lecture d'entrée</td>
+            </tr>
+            <tr>
+                <td><code>idan</code></td>
+                <td>Si</td>
+                <td>Condition</td>
+            </tr>
+            <tr>
+                <td><code>amma</code></td>
+                <td>Sinon</td>
+                <td>Alternative</td>
+            </tr>
+            <tr>
+                <td><code>aiki</code></td>
+                <td>Travail</td>
+                <td>Définition de fonction</td>
+            </tr>
+            <tr>
+                <td><code>mayar</code></td>
+                <td>Retourner</td>
+                <td>Valeur de retour</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Commandes du terminal</h3>
+    
+    <div class="code-block">
+<span class="comment"># Exécuter un programme</span><br>
+$ dabara nom_du_fichier.ha<br><br>
+<span class="comment"># Mode debug (affiche tokens et AST)</span><br>
+$ export DABARA_DEBUG=<span class="number">1</span> && dabara programme.ha<br><br>
+<span class="comment"># Tester tous les exemples</span><br>
+$ ./test_examples.sh<br><br>
+<span class="comment"># Compiler Dabara</span><br>
+$ cargo build --release
+    </div>
+
+    <h2 id="conclusion">10. Conclusion et Perspectives</h2>
+    
+    <h3>Félicitations !</h3>
+    <p>Vous venez de terminer votre initiation à la programmation avec Dabara. 🎉</p>
+
+    <h3>Ce que vous avez appris</h3>
+    <ul>
+        <li>Installation et configuration de l'environnement</li>
+        <li>Variables, types de données et affichage</li>
+        <li>Opérations mathématiques</li>
+        <li>Structures conditionnelles</li>
+        <li>Fonctions et modularité</li>
+        <li>Interaction avec l'utilisateur</li>
+        <li>Collections et listes</li>
+        <li>Développement de projets complets</li>
+    </ul>
+
+    <h3>Prochaines étapes</h3>
+    <ul>
+        <li>Explorer les exemples dans le dossier <code>examples/</code></li>
+        <li>Consulter la documentation complète</li>
+        <li>Participer à la communauté Dabara</li>
+        <li>Contribuer au développement du langage</li>
+    </ul>
+
+    <div class="footer">
+        <h3>Barka da zuwa masana kimiyya!</h3>
+        <p><em>Bienvenue dans le monde merveilleux de la science informatique !</em></p>
+        <p>Ce guide a été créé avec passion pour rendre la programmation accessible à tous dans leur langue maternelle.</p>
+    </div>
+
+</body>
+<script>
+function toggleSolution(id) {
+    const solution = document.getElementById(id);
+    if (solution.style.display === 'block') {
+        solution.style.display = 'none';
+    } else {
+        solution.style.display = 'block';
+    }
+}
+</script>
+</html>
