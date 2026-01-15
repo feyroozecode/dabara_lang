@@ -8,47 +8,70 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #2c3e50;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f9f9f9;
+            background-color: #f0f7f0; /* Light green background */
         }
         
         .cover {
             text-align: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 50%, #f39c12 100%); /* Green to orange gradient */
             color: white;
-            padding: 40px;
-            border-radius: 10px;
+            padding: 50px 40px;
+            border-radius: 15px;
             margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cover::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 20%);
         }
         
         h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
         }
         
         h2 {
-            color: #667eea;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
-            margin-top: 30px;
+            color: #27ae60;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 12px;
+            margin-top: 35px;
+            font-weight: 600;
         }
         
         h3 {
-            color: #764ba2;
-            margin-top: 25px;
+            color: #e67e22;
+            margin-top: 28px;
+            font-weight: 500;
         }
         
         .code-block {
-            background-color: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 5px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ecf0f1;
+            padding: 18px;
+            border-radius: 8px;
             font-family: 'Courier New', monospace;
             overflow-x: auto;
-            margin: 15px 0;
+            margin: 18px 0;
+            border-left: 4px solid #f39c12;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
         .keyword {
@@ -81,7 +104,7 @@
         }
         
         .table th {
-            background-color: #667eea;
+            background: linear-gradient(135deg, #27ae60 0%, #f39c12 100%);
             color: white;
         }
         
@@ -90,42 +113,50 @@
         }
         
         .exercise {
-            background-color: #e8f4f8;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 0 5px 5px 0;
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            border-left: 5px solid #27ae60;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 3px 10px rgba(39, 174, 96, 0.1);
         }
         
         .solution {
-            background-color: #f0f8e8;
-            border-left: 4px solid #4CAF50;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 0 5px 5px 0;
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
             display: none;
+            box-shadow: 0 3px 10px rgba(243, 156, 18, 0.15);
         }
         
         .toggle-btn {
-            background-color: #4CAF50;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 3px;
+            padding: 10px 20px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.95em;
+            font-weight: 500;
+            box-shadow: 0 3px 8px rgba(243, 156, 18, 0.3);
+            transition: all 0.3s ease;
         }
         
         .toggle-btn:hover {
-            background-color: #45a049;
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
         }
         
         .toc {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);
+            margin-bottom: 35px;
+            border: 1px solid #a5d6a7;
         }
         
         .toc ul {
@@ -140,11 +171,13 @@
         
         .toc a {
             text-decoration: none;
-            color: #667eea;
+            color: #27ae60;
+            font-weight: 500;
         }
         
         .toc a:hover {
             text-decoration: underline;
+            color: #f39c12;
         }
         
         .footer {
@@ -173,10 +206,23 @@
 </head>
 <body>
     <div class="cover">
+        <img src="bookcover.png" alt="Couverture Dabara" style="max-width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px;">
         <h1>DABARA</h1>
         <h2>Guide Rapide de Programmation en Hausa</h2>
-        <p>Version 1.0 • 45 pages</p>
-        <p>Apprenez à programmer dans votre langue maternelle</p>
+        <p style="font-size: 1.2em; margin: 20px 0; position: relative; z-index: 2;">Version 1.0 • 45 pages</p>
+        <p style="font-size: 1.1em; margin: 15px 0; position: relative; z-index: 2;">Apprenez à programmer dans votre langue maternelle</p>
+        
+        <div style="margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 10px; position: relative; z-index: 2;">
+            <h3 style="color: white; margin-top: 0;">Par Ibrahim Ahmad</h3>
+            <p style="color: #f39c12; font-size: 1.1em; margin: 10px 0;">Développeur d'Applications Web et Mobile FullStack</p>
+            <p style="color: #f39c12; font-size: 1em; margin: 5px 0;">Fondateur d'AlfajarSoft & Alfajar Academy</p>
+        </div>
+        
+        <div style="margin-top: 25px; font-size: 0.95em; position: relative; z-index: 2; max-width: 600px; margin-left: auto; margin-right: auto;">
+            <p style="color: #d5f4e6;"><strong>Mission :</strong> Rendre l'apprentissage de la programmation accessible en haoussa</p>
+            <p style="color: #c1f0c1;">🎯 Objectif : Enseigner le numérique facilement sans barrière linguistique</p>
+            <p style="color: #a3e4a3;">🌍 Vision : Dabara dans les écoles bilingues nigériennes</p>
+        </div>
     </div>
 
     <div class="toc">
@@ -197,6 +243,23 @@
     </div>
 
     <h2 id="introduction">Introduction : Bienvenue dans Dabara</h2>
+    
+    <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 25px; border-radius: 10px; border-left: 5px solid #2196f3; margin: 25px 0;">
+        <h3 style="color: #0d47a1; margin-top: 0;">🎯 Pourquoi ce livre existe</h3>
+        <p>Imaginez devoir apprendre à conduire une voiture en allemand alors que vous ne parlez que français. C'est exactement ce que font les débutants en programmation : ils doivent d'abord maîtriser l'anglais technique avant de comprendre les concepts informatiques.</p>
+        
+        <p><strong>Dabara</strong> change cette règle. Créé à partir de zéro par <strong>Ibrahim Ahmad</strong>, ce langage permet d'apprendre la programmation directement en haoussa, rendant l'apprentissage plus naturel et accessible.</p>
+        
+        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 15px 0;">
+            <p style="margin: 0;"><strong>🚀 Objectif de ce livre :</strong></p>
+            <ul style="margin: 10px 0 0 20px;">
+                <li>Rendre la programmation accessible aux francophones et locuteurs de haoussa</li>
+                <li>Éliminer la barrière linguistique dans l'apprentissage du numérique</li>
+                <li>Préparer l'avenir où Dabara sera enseigné dans les écoles nigériennes</li>
+                <li>Démontrer qu'on peut créer des technologies dans nos langues locales</li>
+            </ul>
+        </div>
+    </div>
     
     <p><strong>Dabara</strong> est un langage de programmation innovant qui rompt avec la tradition anglo-saxonne dominante dans le monde de l'informatique. Inspiré par le haoussa, l'une des langues les plus parlées en Afrique, Dabara offre une alternative multiculturelle à l'apprentissage de la programmation.</p>
 
@@ -701,9 +764,41 @@ $ cargo build --release
     </ul>
 
     <div class="footer">
-        <h3>Barka da zuwa masana kimiyya!</h3>
-        <p><em>Bienvenue dans le monde merveilleux de la science informatique !</em></p>
-        <p>Ce guide a été créé avec passion pour rendre la programmation accessible à tous dans leur langue maternelle.</p>
+        <div style="background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%); padding: 30px; border-radius: 15px; border: 2px solid #ffd54f; margin-bottom: 25px;">
+            <h3 style="color: #d35400; margin-top: 0;">À propos de l'Auteur</h3>
+            <p><strong>Ibrahim Ahmad</strong></p>
+            <p>Développeur d'Applications Web et Mobile FullStack</p>
+            <p>Fondateur d'<strong><a href="alfajarsoft.com"> AlfajarSoft</a></strong> & <strong><a href="alfajar-academy.com"> Alfajar Academy</a></strong></p>
+            <p style="margin-top: 15px;"><em>"Mon objectif est de démocratiser l'apprentissage de la programmation en Afrique en créant des outils dans nos langues locales."</em></p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 15px; border: 2px solid #81c784;">
+            <h3 style="color: #2e7d32;">🎯 Vision du Projet</h3>
+            <p><strong>Dabara</strong> n'est pas juste un langage de programmation, c'est un mouvement :</p>
+            <ul style="text-align: left; max-width: 600px; margin: 15px auto;">
+                <li>📚 <strong>v1.0</strong> : Enseignement dans les écoles bilingues nigériennes</li>
+                <li>🌍 <strong>v2.0</strong> : Expansion vers d'autres langues africaines</li>
+                <li>💻 <strong>v3.0</strong> : Plateforme d'apprentissage multilingue</li>
+            </ul>
+            <p style="font-size: 1.1em; margin-top: 20px;"><strong>Barka da zuwa masana kimiyya!</strong></p>
+            <p><em>Bienvenue dans le monde merveilleux de la science informatique !</em></p>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px;">
+            <p><strong>📌 Prochaines étapes :</strong></p>
+            <ul style="display: inline-block; text-align: left;">
+                <li>Pratiquez avec les exemples fournis</li>
+                <li>Explorez les projets dans le dossier <code>examples/</code></li>
+                <li>Rejoignez la communauté Dabara sur GitHub</li>
+                <li>Contribuez à la traduction dans votre langue</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 25px; font-size: 0.9em; color: #7f8c8d;">
+            <p>Ce guide est un projet open-source créé avec passion</p>
+            <p>pour rendre la programmation accessible à tous dans leur langue maternelle.</p>
+            <p style="margin-top: 15px;">🌟 <strong>Le futur de la technologie en Afrique commence ici !</strong> 🌟</p>
+        </div>
     </div>
 
 </body>
