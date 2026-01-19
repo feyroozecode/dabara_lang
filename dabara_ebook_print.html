@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dabara : Guide Rapide de Programmation en Hausa</title>
+    <style>
+        /* Print-optimized styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+            
+            body {
+                font-size: 12pt;
+                line-height: 1.5;
+                color: #000;
+                background: white;
+            }
+            
+            .cover {
+                page-break-after: always;
+                text-align: center;
+                padding: 3cm 2cm;
+                background: linear-gradient(135deg, #27ae60 0%, #2ecc71 50%, #f39c12 100%);
+                color: white;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .cover img {
+                max-width: 80%;
+                height: auto;
+                margin-bottom: 1cm;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            }
+            
+            h1 {
+                font-size: 36pt;
+                margin: 0.5cm 0;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            }
+            
+            h2 {
+                font-size: 20pt;
+                margin: 0.3cm 0;
+                color: #f39c12;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+        
+        /* Screen styles */
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            max-width: 21cm;
+            margin: 0 auto;
+            padding: 2cm;
+            background-color: #f0f7f0;
+        }
+        
+        .cover {
+            text-align: center;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 50%, #f39c12 100%);
+            color: white;
+            padding: 3cm 2cm;
+            border-radius: 15px;
+            margin-bottom: 2cm;
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+        }
+        
+        .cover img {
+            max-width: 80%;
+            height: auto;
+            margin-bottom: 1cm;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            font-size: 36pt;
+            margin: 0.5cm 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        h2 {
+            color: #27ae60;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 0.3cm;
+            margin-top: 1cm;
+            font-weight: 600;
+            font-size: 18pt;
+        }
+        
+        h3 {
+            color: #e67e22;
+            margin-top: 0.8cm;
+            font-weight: 500;
+            font-size: 16pt;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 0.5cm;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+            overflow-x: auto;
+            margin: 0.5cm 0;
+            border-left: 4px solid #f39c12;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.5cm 0;
+            font-size: 11pt;
+        }
+        
+        .table th, .table td {
+            border: 1px solid #bdc3c7;
+            padding: 0.3cm;
+            text-align: left;
+        }
+        
+        .table th {
+            background: linear-gradient(135deg, #27ae60 0%, #f39c12 100%);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .toc {
+            background: #e8f5e8;
+            padding: 1cm;
+            border-radius: 10px;
+            border: 1px solid #a5d6a7;
+            margin-bottom: 1cm;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin: 0.2cm 0;
+            padding-left: 0.5cm;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: #27ae60;
+            font-weight: 500;
+        }
+        
+        .exercise {
+            background: #e8f5e8;
+            border-left: 5px solid #27ae60;
+            padding: 0.5cm;
+            margin: 0.5cm 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .solution {
+            background: #fff8e1;
+            border-left: 5px solid #f39c12;
+            padding: 0.5cm;
+            margin: 0.3cm 0;
+            border-radius: 0 5px 5px 0;
+            display: none;
+        }
+        
+        .toggle-btn {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            border: none;
+            padding: 0.3cm 0.5cm;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 11pt;
+            font-weight: 500;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 2cm;
+            padding: 1cm;
+            border-top: 1px solid #bdc3c7;
+            color: #7f8c8d;
+            font-size: 10pt;
+        }
+        
+        .author-box {
+            background: #fff8e1;
+            padding: 1cm;
+            border-radius: 10px;
+            border: 2px solid #f39c12;
+            margin: 1cm 0;
+        }
+        
+        .vision-box {
+            background: #e8f5e8;
+            padding: 1cm;
+            border-radius: 10px;
+            border: 2px solid #81c784;
+            margin: 1cm 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover">
+        <img src="bookcover.png" alt="Couverture Dabara" onerror="this.style.display='none'">
+        <h1>DABARA</h1>
+        <h2>Guide Rapide de Programmation en Hausa</h2>
+        <p style="font-size: 14pt; margin: 0.5cm 0;">Version 1.0 • 45 pages</p>
+        <p style="font-size: 12pt; margin: 0.3cm 0;">Apprenez à programmer dans votre langue maternelle</p>
+        
+        <div class="author-box">
+            <h3 style="color: white; margin-top: 0;">Par Ibrahim Ahmad</h3>
+            <p style="color: #f39c12; font-size: 12pt; margin: 0.3cm 0;">Développeur d'Applications Web et Mobile FullStack</p>
+            <p style="color: #f39c12; font-size: 11pt; margin: 0.2cm 0;">
+                Fondateur d'<a href="https://alfajarsoft.com" style="color: #ffd54f;">AlfajarSoft</a> & 
+                <a href="https://alfajar-academy.com" style="color: #ffd54f;">Alfajar Academy</a>
+            </p>
+            <p style="margin-top: 0.5cm; font-style: italic; color: #d5f4e6;">
+                "Mon objectif est de démocratiser l'apprentissage de la programmation en Afrique en créant des outils dans nos langues locales."
+            </p>
+        </div>
+        
+        <div style="margin-top: 1cm; font-size: 11pt;">
+            <p style="color: #d5f4e6;"><strong>Mission :</strong> Rendre l'apprentissage de la programmation accessible en haoussa</p>
+            <p style="color: #c1f0c1;">🎯 Objectif : Enseigner le numérique facilement sans barrière linguistique</p>
+            <p style="color: #a3e4a3;">🌍 Vision : Dabara dans les écoles bilingues nigériennes</p>
+        </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="page-break"></div>
+    <div class="toc">
+        <h2>Sommaire</h2>
+        <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#installation">1. Installation et Configuration</a></li>
+            <li><a href="#fondamentaux">2. Les Fondamentaux</a></li>
+            <li><a href="#mathematiques">3. Opérations Mathématiques</a></li>
+            <li><a href="#conditions">4. Conditions et Logique</a></li>
+            <li><a href="#fonctions">5. Fonctions et Modularité</a></li>
+            <li><a href="#interaction">6. Interaction avec l'Utilisateur</a></li>
+            <li><a href="#collections">7. Collections et Listes</a></li>
+            <li><a href="#projets">8. Projets Pratiques</a></li>
+            <li><a href="#references">9. Références et Commandes</a></li>
+            <li><a href="#conclusion">10. Conclusion</a></li>
+        </ul>
+    </div>
+
+    <!-- Content Sections -->
+    <div class="page-break"></div>
+    <h2 id="introduction">Introduction : Bienvenue dans Dabara</h2>
+    
+    <div style="background: #e3f2fd; padding: 1cm; border-radius: 10px; border-left: 5px solid #2196f3; margin: 1cm 0;">
+        <h3 style="color: #0d47a1; margin-top: 0;">🎯 Pourquoi ce livre existe</h3>
+        <p>Imaginez devoir apprendre à conduire une voiture en allemand alors que vous ne parlez que français. C'est exactement ce que font les débutants en programmation : ils doivent d'abord maîtriser l'anglais technique avant de comprendre les concepts informatiques.</p>
+        
+        <p><strong>Dabara</strong> change cette règle. Créé à partir de zéro par <strong>Ibrahim Ahmad</strong>, ce langage permet d'apprendre la programmation directement en haoussa, rendant l'apprentissage plus naturel et accessible.</p>
+        
+        <div style="background: #fff3e0; padding: 0.5cm; border-radius: 8px; margin: 0.5cm 0;">
+            <p style="margin: 0;"><strong>🚀 Objectif de ce livre :</strong></p>
+            <ul style="margin: 0.3cm 0 0 1cm;">
+                <li>Rendre la programmation accessible aux francophones et locuteurs de haoussa</li>
+                <li>Éliminer la barrière linguistique dans l'apprentissage du numérique</li>
+                <li>Préparer l'avenir où Dabara sera enseigné dans les écoles nigériennes</li>
+                <li>Démontrer qu'on peut créer des technologies dans nos langues locales</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2 id="installation">1. Installation et Configuration</h2>
+    
+    <p>Avant de commencer à programmer, configurons votre environnement de développement.</p>
+
+    <h3>Méthodes d'installation</h3>
+
+    <h4>Méthode 1 : Via Cargo (Recommandée)</h4>
+    <p>Si vous avez Rust installé :</p>
+    <div class="code-block">
+# Installer Dabara depuis le dépôt officiel<br>
+cargo install --git https://github.com/feyroozecode/dabara_lang.git<br><br>
+# Vérifier l'installation<br>
+dabara --version
+    </div>
+
+    <h4>Méthode 2 : Compilation depuis les sources</h4>
+    <div class="code-block">
+# Cloner le dépôt<br>
+git clone https://github.com/feyroozecode/dabara_lang.git<br>
+cd dabara_lang<br><br>
+# Compiler<br>
+cargo build --release<br><br>
+# Copier l'exécutable dans votre PATH<br>
+sudo cp target/release/dabara /usr/local/bin/
+    </div>
+
+    <h3>Vérification de l'installation</h3>
+    <p>Testons que tout fonctionne correctement :</p>
+    <div class="code-block">
+# Créer un fichier test<br>
+<span style="color: #3498db;">echo</span> '<span style="color: #3498db;">fara</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> <span style="color: #f1c40f;">"Barka da zuwa Dabara!"</span><br>
+<span style="color: #3498db;">kare</span>' &gt; test.ha<br><br>
+# Exécuter le programme<br>
+<span style="color: #3498db;">dabara</span> test.ha
+    </div>
+    <p>Vous devriez voir : <code>Barka da zuwa Dabara!</code></p>
+
+    <h2 id="fondamentaux">2. Les Fondamentaux</h2>
+    
+    <p>Commençons par les concepts de base de la programmation.</p>
+
+    <h3>Variables et déclaration</h3>
+    <p>Une variable est comme une boîte qui contient une valeur. Nous utilisons le mot-clé <code>naɗa</code> pour créer des variables.</p>
+    
+    <div class="code-block">
+<span style="color: #3498db;">fara</span><br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Déclaration de variables</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> sunan = <span style="color: #f1c40f;">"Ahmad"</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> shekarun = <span style="color: #e74c3c;">25</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> aiki = <span style="color: #f1c40f;">"Mai shirye-shirye"</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Affichage des variables</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> sunan<br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> shekarun<br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> aiki<br>
+<span style="color: #3498db;">kare</span>
+    </div>
+
+    <h2 id="mathematiques">3. Opérations Mathématiques</h2>
+    
+    <p>Dabara supporte les opérations arithmétiques de base.</p>
+
+    <h3>Les quatre opérations</h3>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Opération</th>
+                <th>Symbole</th>
+                <th>Exemple</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Addition</td>
+                <td><code>+</code></td>
+                <td><code>5 + 3 = 8</code></td>
+            </tr>
+            <tr>
+                <td>Soustraction</td>
+                <td><code>-</code></td>
+                <td><code>10 - 4 = 6</code></td>
+            </tr>
+            <tr>
+                <td>Multiplication</td>
+                <td><code>*</code></td>
+                <td><code>6 * 7 = 42</code></td>
+            </tr>
+            <tr>
+                <td>Division</td>
+                <td><code>/</code></td>
+                <td><code>20 / 4 = 5</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 id="conditions">4. Conditions et Logique</h2>
+    
+    <p>Les structures conditionnelles permettent à votre programme de prendre des décisions.</p>
+
+    <h3>Structure conditionnelle de base</h3>
+    
+    <div class="code-block">
+<span style="color: #3498db;">fara</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> shekarun = <span style="color: #e74c3c;">18</span><br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #3498db;">idan</span> shekarun &gt;= <span style="color: #e74c3c;">18</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> <span style="color: #f1c40f;">"Kuna yawa don shiga"</span><br>
+&nbsp;&nbsp;} <span style="color: #3498db;">amma</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> <span style="color: #f1c40f;">"Ba ku yawa a halin yanzu"</span><br>
+&nbsp;&nbsp;}<br>
+<span style="color: #3498db;">kare</span>
+    </div>
+
+    <h2 id="fonctions">5. Fonctions et Modularité</h2>
+    
+    <p>Les fonctions permettent de réutiliser du code et d'organiser votre programme.</p>
+
+    <h3>Définition et appel de fonctions</h3>
+    
+    <div class="code-block">
+<span style="color: #3498db;">fara</span><br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Définition d'une fonction</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">aiki</span> lissafi(a, b) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #3498db;">mayar</span> a + b<br>
+&nbsp;&nbsp;}<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Appel de la fonction</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> sakamakon = lissafi(<span style="color: #e74c3c;">10</span>, <span style="color: #e74c3c;">5</span>)<br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> <span style="color: #f1c40f;">"10 + 5 = "</span> + sakamakon<br>
+<span style="color: #3498db;">kare</span>
+    </div>
+
+    <h2 id="interaction">6. Interaction avec l'Utilisateur</h2>
+    
+    <p>Rendez vos programmes interactifs avec la lecture d'entrées utilisateur.</p>
+
+    <h3>Lecture d'entrées avec <code>karɓa</code></h3>
+    
+    <div class="code-block">
+<span style="color: #3498db;">fara</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> <span style="color: #f1c40f;">"Suna nawa suke?"</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> sunan = <span style="color: #3498db;">karɓa</span>()<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> <span style="color: #f1c40f;">"Shekaru nawa kuke?"</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> shekarun = <span style="color: #3498db;">karɓa</span>()<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> <span style="color: #f1c40f;">"Sannu "</span> + sunan + <span style="color: #f1c40f;">"! Kuna shekaru "</span> + shekarun<br>
+<span style="color: #3498db;">kare</span>
+    </div>
+
+    <h2 id="collections">7. Collections et Listes</h2>
+    
+    <p>Organisez vos données avec des collections.</p>
+
+    <h3>Création de listes</h3>
+    
+    <div class="code-block">
+<span style="color: #3498db;">fara</span><br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Liste de textes</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> sunaye = [<span style="color: #f1c40f;">"Ahmad"</span>, <span style="color: #f1c40f;">"Fatima"</span>, <span style="color: #f1c40f;">"Musa"</span>, <span style="color: #f1c40f;">"Aisha"</span>]<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Liste de nombres</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> lambobi = [<span style="color: #e74c3c;">10</span>, <span style="color: #e74c3c;">20</span>, <span style="color: #e74c3c;">30</span>, <span style="color: #e74c3c;">40</span>, <span style="color: #e74c3c;">50</span>]<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> sunaye<br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> lambobi<br>
+<span style="color: #3498db;">kare</span>
+    </div>
+
+    <h2 id="projets">8. Projets Pratiques</h2>
+    
+    <p>Appliquons nos connaissances à des projets concrets.</p>
+
+    <h3>Projet 1 : Gestionnaire de Budget Personnel</h3>
+    
+    <div class="code-block">
+<span style="color: #3498db;">fara</span><br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Variables globales</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> kudin_shiga = []<br>
+&nbsp;&nbsp;<span style="color: #3498db;">naɗa</span> kudin_fitowa = []<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Fonction pour ajouter revenu</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">aiki</span> kara_shiga(kudi, bayani) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;kudin_shiga.<span style="color: #3498db;">kara</span>(kudi)<br>
+&nbsp;&nbsp;}<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Fonction pour ajouter dépense</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">aiki</span> kara_fitowa(kudi, bayani) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;kudin_fitowa.<span style="color: #3498db;">kara</span>(kudi)<br>
+&nbsp;&nbsp;}<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Ajout de revenus</span><br>
+&nbsp;&nbsp;kara_shiga(<span style="color: #e74c3c;">50000</span>, <span style="color: #f1c40f;">"Mai"</span>)<br>
+&nbsp;&nbsp;kara_shiga(<span style="color: #e74c3c;">25000</span>, <span style="color: #f1c40f;">"Kasuwanci"</span>)<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Ajout de dépenses</span><br>
+&nbsp;&nbsp;kara_fitowa(<span style="color: #e74c3c;">15000</span>, <span style="color: #f1c40f;">"Abinci"</span>)<br>
+&nbsp;&nbsp;kara_fitowa(<span style="color: #e74c3c;">8000</span>, <span style="color: #f1c40f;">"Transport"</span>)<br>&nbsp;&nbsp;<br>
+&nbsp;&nbsp;<span style="color: #95a5a6;"># Calculs et affichage</span><br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> <span style="color: #f1c40f;">"Jimlar shiga: "</span> + kudin_shiga<br>
+&nbsp;&nbsp;<span style="color: #3498db;">rubuta</span> <span style="color: #f1c40f;">"Jimlar fitowa: "</span> + kudin_fitowa<br>
+<span style="color: #3498db;">kare</span>
+    </div>
+
+    <h2 id="references">9. Références et Commandes Utiles</h2>
+    
+    <h3>Référence rapide des mots-clés</h3>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mot-clé</th>
+                <th>Signification</th>
+                <th>Utilisation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>fara</code></td>
+                <td>Commencer</td>
+                <td>Début de programme</td>
+            </tr>
+            <tr>
+                <td><code>kare</code></td>
+                <td>Terminer</td>
+                <td>Fin de programme</td>
+            </tr>
+            <tr>
+                <td><code>naɗa</code></td>
+                <td>Créer</td>
+                <td>Déclaration de variable</td>
+            </tr>
+            <tr>
+                <td><code>rubuta</code></td>
+                <td>Écrire</td>
+                <td>Affichage</td>
+            </tr>
+            <tr>
+                <td><code>karɓa</code></td>
+                <td>Recevoir</td>
+                <td>Lecture d'entrée</td>
+            </tr>
+            <tr>
+                <td><code>idan</code></td>
+                <td>Si</td>
+                <td>Condition</td>
+            </tr>
+            <tr>
+                <td><code>amma</code></td>
+                <td>Sinon</td>
+                <td>Alternative</td>
+            </tr>
+            <tr>
+                <td><code>aiki</code></td>
+                <td>Travail</td>
+                <td>Définition de fonction</td>
+            </tr>
+            <tr>
+                <td><code>mayar</code></td>
+                <td>Retourner</td>
+                <td>Valeur de retour</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Commandes du terminal</h3>
+    
+    <div class="code-block">
+<span style="color: #95a5a6;"># Exécuter un programme</span><br>
+$ dabara nom_du_fichier.ha<br><br>
+<span style="color: #95a5a6;"># Mode debug (affiche tokens et AST)</span><br>
+$ export DABARA_DEBUG=<span style="color: #e74c3c;">1</span> && dabara programme.ha<br><br>
+<span style="color: #95a5a6;"># Tester tous les exemples</span><br>
+$ ./test_examples.sh<br><br>
+<span style="color: #95a5a6;"># Compiler Dabara</span><br>
+$ cargo build --release
+    </div>
+
+    <h2 id="conclusion">10. Conclusion et Perspectives</h2>
+    
+    <h3>Félicitations !</h3>
+    <p>Vous venez de terminer votre initiation à la programmation avec Dabara. 🎉</p>
+
+    <h3>Ce que vous avez appris</h3>
+    <ul>
+        <li>Installation et configuration de l'environnement</li>
+        <li>Variables, types de données et affichage</li>
+        <li>Opérations mathématiques</li>
+        <li>Structures conditionnelles</li>
+        <li>Fonctions et modularité</li>
+        <li>Interaction avec l'utilisateur</li>
+        <li>Collections et listes</li>
+        <li>Développement de projets complets</li>
+    </ul>
+
+    <div class="author-box">
+        <h3>À propos de l'Auteur</h3>
+        <p><strong>Ibrahim Ahmad</strong></p>
+        <p>Développeur d'Applications Web et Mobile FullStack</p>
+        <p>Fondateur d'<strong><a href="https://alfajarsoft.com">AlfajarSoft</a></strong> & <strong><a href="https://alfajar-academy.com">Alfajar Academy</a></strong></p>
+        <p style="margin-top: 0.5cm;"><em>"Mon objectif est de démocratiser l'apprentissage de la programmation en Afrique en créant des outils dans nos langues locales."</em></p>
+    </div>
+    
+    <div class="vision-box">
+        <h3>🎯 Vision du Projet</h3>
+        <p><strong>Dabara</strong> n'est pas juste un langage de programmation, c'est un mouvement :</p>
+        <ul style="text-align: left; max-width: 15cm; margin: 0.5cm auto;">
+            <li>📚 <strong>v1.0</strong> : Enseignement dans les écoles bilingues nigériennes</li>
+            <li>🌍 <strong>v2.0</strong> : Expansion vers d'autres langues africaines</li>
+            <li>💻 <strong>v3.0</strong> : Plateforme d'apprentissage multilingue</li>
+        </ul>
+        <p style="font-size: 12pt; margin-top: 1cm;"><strong>Barka da zuwa masana kimiyya!</strong></p>
+        <p><em>Bienvenue dans le monde merveilleux de la science informatique !</em></p>
+    </div>
+    
+    <div style="margin-top: 1cm; padding: 0.5cm; background: #e3f2fd; border-radius: 10px;">
+        <p><strong>📌 Prochaines étapes :</strong></p>
+        <ul style="display: inline-block; text-align: left;">
+            <li>Pratiquez avec les exemples fournis</li>
+            <li>Explorez les projets dans le dossier <code>examples/</code></li>
+            <li>Rejoignez la communauté Dabara sur GitHub</li>
+            <li>Contribuez à la traduction dans votre langue</li>
+        </ul>
+    </div>
+    
+    <div class="footer">
+        <p>Ce guide est un projet open-source créé avec passion</p>
+        <p>pour rendre la programmation accessible à tous dans leur langue maternelle.</p>
+        <p style="margin-top: 0.5cm;">🌟 <strong>Le futur de la technologie en Afrique commence ici !</strong> 🌟</p>
+    </div>
+
+    <script>
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.style.display === 'block') {
+                solution.style.display = 'none';
+            } else {
+                solution.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
