@@ -10,9 +10,9 @@ use crate::error::Error;
 pub enum Token {
     // Mots-clés Hausa
     Begin,      // fara
-    End,        // ƙare  
+    End,        // ƙare
     Print,      // rubuta
-    Let,        // naɗa
+    Let,        // var (primary), naɗa/nada (deprecated)
     True,       // gaskiya
     False,      // karya
     Function,   // aiki
@@ -73,11 +73,14 @@ impl Token {
     /// Convertit un mot en token si c'est un mot-clé
     fn from_keyword(word: &str) -> Option<Token> {
         match word {
-            // Versions originales avec caractères haoussa
+            // Primary universal keyword
+            "var" => Some(Token::Let),       // Primary keyword for variable declaration
+
+            // Versions originales avec caractères haoussa (deprecated but supported)
             "fara" => Some(Token::Begin),
             "ƙare" => Some(Token::End),
             "rubuta" => Some(Token::Print),
-            "naɗa" => Some(Token::Let),
+            "naɗa" => Some(Token::Let),      // Deprecated: use 'var' instead
             "gaskiya" => Some(Token::True),
             "karya" => Some(Token::False),
             "aiki" => Some(Token::Function),
@@ -99,9 +102,9 @@ impl Token {
             "katse" => Some(Token::Break),
             "ci_gaba" => Some(Token::Continue),
 
-            // Versions alternatives avec caractères latins
+            // Versions alternatives avec caractères latins (deprecated but supported)
             "kare" => Some(Token::End),      // Alternative pour ƙare
-            "nada" => Some(Token::Let),      // Alternative pour naɗa
+            "nada" => Some(Token::Let),      // Deprecated: use 'var' instead
             // Note: "kara" removed from keywords to allow it as method name
 
             _ => None,

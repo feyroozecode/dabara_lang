@@ -24,6 +24,83 @@ fara
     }
 
     #[test]
+    fn test_var_keyword_basic() {
+        let program = r#"
+fara
+  var sunan = "Ahmad"
+  var lambar = 42
+  rubuta sunan
+  rubuta lambar
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_var_keyword_all_types() {
+        let program = r#"
+fara
+  var integer = 100
+  var float_num = 3.14
+  var text = "Hello"
+  var truth = gaskiya
+  var lie = karya
+  var lista = [1, 2, 3]
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_var_keyword_with_arithmetic() {
+        let program = r#"
+fara
+  var a = 10
+  var b = 5
+  var suma = a + b
+  var diff = a - b
+  var prod = a * b
+  var quot = a / b
+  rubuta suma
+  rubuta diff
+  rubuta prod
+  rubuta quot
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_var_keyword_in_functions() {
+        let program = r#"
+fara
+  aiki calculate(x, y) {
+    var result = x + y
+    mayar result
+  }
+  var answer = calculate(10, 5)
+  rubuta answer
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_var_keyword_mixed_with_hausa() {
+        let program = r#"
+fara
+  var name = "Ahmad"
+  naɗa age = 25
+  nada city = "Kano"
+  rubuta name
+  rubuta age
+  rubuta city
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
     fn test_variables() {
         let program = r#"
 fara
@@ -88,6 +165,21 @@ kare
             Token::False,
             Token::Plus,
             Token::Minus,
+            Token::Eof,
+        ];
+
+        assert_eq!(tokens, expected);
+    }
+
+    #[test]
+    fn test_tokenizer_var_keyword() {
+        let tokens = tokenize("fara var rubuta kare").unwrap();
+
+        let expected = vec![
+            Token::Begin,
+            Token::Let,
+            Token::Print,
+            Token::End,
             Token::Eof,
         ];
 
@@ -599,6 +691,95 @@ fara
         let result = interpreter.get_variable("result").expect("Variable not found");
         match result {
             Value::Number(n) => assert_eq!(*n, 2), // (20 / 4) / 2 = 5 / 2 = 2, not 20 / (4 / 2) = 10
+            _ => panic!("Expected number"),
+        }
+    }
+
+    // Tests d'exécution pour le mot-clé 'var'
+    #[test]
+    fn test_execution_var_keyword_numbers() {
+        let source = r#"
+fara
+  var x = 42
+  var y = 3.14
+ƙare
+"#;
+        let tokens = tokenize(source).expect("Failed to tokenize");
+        let program = parse(tokens).expect("Failed to parse");
+        let mut interpreter = Interpreter::new();
+        interpreter.execute(program).expect("Failed to execute");
+
+        let x = interpreter.get_variable("x").expect("Variable not found");
+        match x {
+            Value::Number(n) => assert_eq!(*n, 42),
+            _ => panic!("Expected number"),
+        }
+
+        let y = interpreter.get_variable("y").expect("Variable not found");
+        match y {
+            Value::Float(f) => assert_eq!(*f, 3.14),
+            _ => panic!("Expected float"),
+        }
+    }
+
+    #[test]
+    fn test_execution_var_keyword_string() {
+        let source = r#"
+fara
+  var name = "Ahmad"
+ƙare
+"#;
+        let tokens = tokenize(source).expect("Failed to tokenize");
+        let program = parse(tokens).expect("Failed to parse");
+        let mut interpreter = Interpreter::new();
+        interpreter.execute(program).expect("Failed to execute");
+
+        let name = interpreter.get_variable("name").expect("Variable not found");
+        match name {
+            Value::String(s) => assert_eq!(s, "Ahmad"),
+            _ => panic!("Expected string"),
+        }
+    }
+
+    #[test]
+    fn test_execution_var_keyword_arithmetic() {
+        let source = r#"
+fara
+  var a = 10
+  var b = 5
+  var result = a + b * 2
+ƙare
+"#;
+        let tokens = tokenize(source).expect("Failed to tokenize");
+        let program = parse(tokens).expect("Failed to parse");
+        let mut interpreter = Interpreter::new();
+        interpreter.execute(program).expect("Failed to execute");
+
+        let result = interpreter.get_variable("result").expect("Variable not found");
+        match result {
+            Value::Number(n) => assert_eq!(*n, 20), // 10 + (5 * 2) = 20
+            _ => panic!("Expected number"),
+        }
+    }
+
+    #[test]
+    fn test_execution_var_and_nada_interoperability() {
+        let source = r#"
+fara
+  var x = 10
+  naɗa y = 20
+  nada z = 30
+  var total = x + y + z
+ƙare
+"#;
+        let tokens = tokenize(source).expect("Failed to tokenize");
+        let program = parse(tokens).expect("Failed to parse");
+        let mut interpreter = Interpreter::new();
+        interpreter.execute(program).expect("Failed to execute");
+
+        let total = interpreter.get_variable("total").expect("Variable not found");
+        match total {
+            Value::Number(n) => assert_eq!(*n, 60), // 10 + 20 + 30 = 60
             _ => panic!("Expected number"),
         }
     }
