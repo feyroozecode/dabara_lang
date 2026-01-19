@@ -55,7 +55,7 @@ kare
 fara
   naɗa a = 5
   naɗa b = 3
-  naɗa sakamako = a ƙara b
+  naɗa sakamako = a + b
   rubuta sakamako
 ƙare
 "#;
@@ -68,7 +68,7 @@ fara
 fara
   nada a = 5
   nada b = 3
-  nada sakamako = a kara b
+  nada sakamako = a + b
   rubuta sakamako
 kare
 "#;
@@ -77,8 +77,8 @@ kare
 
     #[test]
     fn test_tokenizer_keywords() {
-        let tokens = tokenize("fara naɗa rubuta ƙare gaskiya karya ƙara rage").unwrap();
-        
+        let tokens = tokenize("fara naɗa rubuta ƙare gaskiya karya + -").unwrap();
+
         let expected = vec![
             Token::Begin,
             Token::Let,
@@ -90,14 +90,14 @@ kare
             Token::Minus,
             Token::Eof,
         ];
-        
+
         assert_eq!(tokens, expected);
     }
 
     #[test]
     fn test_tokenizer_latin_keywords() {
-        let tokens = tokenize("fara nada rubuta kare gaskiya karya kara rage").unwrap();
-        
+        let tokens = tokenize("fara nada rubuta kare gaskiya karya + -").unwrap();
+
         let expected = vec![
             Token::Begin,
             Token::Let,
@@ -109,7 +109,7 @@ kare
             Token::Minus,
             Token::Eof,
         ];
-        
+
         assert_eq!(tokens, expected);
     }
 
@@ -173,7 +173,7 @@ kare
 fara
   naɗa a = 5
   naɗa b = 3
-  naɗa sakamako = a ninka b
+  naɗa sakamako = a * b
   rubuta sakamako
 ƙare
 "#;
@@ -186,7 +186,7 @@ fara
 fara
   naɗa a = 15
   naɗa b = 3
-  naɗa sakamako = a raba b
+  naɗa sakamako = a / b
   rubuta sakamako
 ƙare
 "#;
@@ -200,7 +200,7 @@ fara
   naɗa a = 10
   naɗa b = 2
   naɗa c = 3
-  naɗa sakamako = a ƙara b ninka c rage 1
+  naɗa sakamako = a + b * c - 1
   rubuta sakamako
 ƙare
 "#;
@@ -209,14 +209,14 @@ fara
     
     #[test]
     fn test_tokenizer_new_operators() {
-        let tokens = tokenize("ninka raba").unwrap();
-        
+        let tokens = tokenize("* /").unwrap();
+
         let expected = vec![
             Token::Multiply,
             Token::Divide,
             Token::Eof,
         ];
-        
+
         assert_eq!(tokens, expected);
     }
     
@@ -320,7 +320,7 @@ fara
 fara
   rubuta "Rubuta sunanka: "
   naɗa suna = karɓa
-  rubuta "Sannu " ƙara suna
+  rubuta "Sannu " + suna
 ƙare
 "#;
         assert!(parse_program(program).is_ok());
@@ -332,13 +332,13 @@ fara
         let mut interpreter = Interpreter::new();
         interpreter.set_variable("a".to_string(), Value::Number(6));
         interpreter.set_variable("b".to_string(), Value::Number(7));
-        
+
         // Tester la multiplication avec un programme complet
         let result = parse_program(r#"
 fara
   naɗa a = 6
   naɗa b = 7
-  naɗa c = a ninka b
+  naɗa c = a * b
   rubuta c
 ƙare
 "#);
@@ -350,11 +350,11 @@ fara
         let mut interpreter = Interpreter::new();
         interpreter.set_variable("a".to_string(), Value::Number(20));
         interpreter.set_variable("b".to_string(), Value::Number(4));
-        
+
         // Test que la division parse correctement
         let result = parse_program(r#"
 fara
-  naɗa c = 20 raba 4
+  naɗa c = 20 / 4
   rubuta c
 ƙare
 "#);
@@ -367,7 +367,7 @@ fara
         // L'erreur runtime sera gérée lors de l'exécution
         let result = parse_program(r#"
 fara
-  naɗa c = 10 raba 0
+  naɗa c = 10 / 0
   rubuta c
 ƙare
 "#);
@@ -379,10 +379,227 @@ fara
         // Test des expressions complexes avec priorité des opérateurs
         let result = parse_program(r#"
 fara
-  naɗa a = 2 ƙara 3 ninka 4 rage 1
+  naɗa a = 2 + 3 * 4 - 1
   rubuta a
 ƙare
 "#);
         assert!(result.is_ok());
+    }
+
+    // Tests de régression pour la priorité des opérateurs
+    #[test]
+    fn test_operator_precedence_multiplication_before_addition() {
+        // Test: 2 + 3 * 4 should be 2 + 12 = 14, not (2 + 3) * 4 = 20
+        let program = r#"
+fara
+  naɗa result = 2 + 3 * 4
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_operator_precedence_division_before_subtraction() {
+        // Test: 20 - 8 / 2 should be 20 - 4 = 16, not (20 - 8) / 2 = 6
+        let program = r#"
+fara
+  naɗa result = 20 - 8 / 2
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_operator_precedence_multiple_multiplications() {
+        // Test: 2 * 3 * 4 should be 24
+        let program = r#"
+fara
+  naɗa result = 2 * 3 * 4
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_operator_precedence_mixed_operations() {
+        // Test: 10 + 5 * 2 - 3 / 3 should be 10 + 10 - 1 = 19
+        let program = r#"
+fara
+  naɗa result = 10 + 5 * 2 - 3 / 3
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_operator_precedence_with_parentheses() {
+        // Test: (2 + 3) * 4 should be 5 * 4 = 20
+        let program = r#"
+fara
+  naɗa result = (2 + 3) * 4
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_operator_precedence_nested_parentheses() {
+        // Test: ((10 + 5) * 2) - 3 should be (15 * 2) - 3 = 27
+        let program = r#"
+fara
+  naɗa result = ((10 + 5) * 2) - 3
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_operator_precedence_division_and_multiplication() {
+        // Test: 20 / 4 * 5 should be (20 / 4) * 5 = 5 * 5 = 25 (left-to-right)
+        let program = r#"
+fara
+  naɗa result = 20 / 4 * 5
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_operator_precedence_unary_minus() {
+        // Test: -5 * 2 should be (-5) * 2 = -10, not -(5 * 2)
+        let program = r#"
+fara
+  naɗa result = -5 * 2
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_operator_precedence_unary_plus() {
+        // Test: +5 + 3 should be 5 + 3 = 8
+        let program = r#"
+fara
+  naɗa result = +5 + 3
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    #[test]
+    fn test_operator_precedence_complex_expression() {
+        // Test: 100 - 20 / 5 + 3 * 2 should be 100 - 4 + 6 = 102
+        let program = r#"
+fara
+  naɗa result = 100 - 20 / 5 + 3 * 2
+  rubuta result
+ƙare
+"#;
+        assert!(parse_program(program).is_ok());
+    }
+
+    // Tests d'exécution pour vérifier les valeurs calculées avec la bonne priorité
+    #[test]
+    fn test_execution_multiplication_before_addition() {
+        let source = r#"
+fara
+  naɗa result = 2 + 3 * 4
+ƙare
+"#;
+        let tokens = tokenize(source).expect("Failed to tokenize");
+        let program = parse(tokens).expect("Failed to parse");
+        let mut interpreter = Interpreter::new();
+        interpreter.execute(program).expect("Failed to execute");
+
+        let result = interpreter.get_variable("result").expect("Variable not found");
+        match result {
+            Value::Number(n) => assert_eq!(*n, 14), // 2 + 12 = 14, not 20
+            _ => panic!("Expected number"),
+        }
+    }
+
+    #[test]
+    fn test_execution_division_before_subtraction() {
+        let source = r#"
+fara
+  naɗa result = 20 - 8 / 2
+ƙare
+"#;
+        let tokens = tokenize(source).expect("Failed to tokenize");
+        let program = parse(tokens).expect("Failed to parse");
+        let mut interpreter = Interpreter::new();
+        interpreter.execute(program).expect("Failed to execute");
+
+        let result = interpreter.get_variable("result").expect("Variable not found");
+        match result {
+            Value::Number(n) => assert_eq!(*n, 16), // 20 - 4 = 16, not 6
+            _ => panic!("Expected number"),
+        }
+    }
+
+    #[test]
+    fn test_execution_parentheses_override_precedence() {
+        let source = r#"
+fara
+  naɗa result = (2 + 3) * 4
+ƙare
+"#;
+        let tokens = tokenize(source).expect("Failed to tokenize");
+        let program = parse(tokens).expect("Failed to parse");
+        let mut interpreter = Interpreter::new();
+        interpreter.execute(program).expect("Failed to execute");
+
+        let result = interpreter.get_variable("result").expect("Variable not found");
+        match result {
+            Value::Number(n) => assert_eq!(*n, 20), // 5 * 4 = 20
+            _ => panic!("Expected number"),
+        }
+    }
+
+    #[test]
+    fn test_execution_complex_expression() {
+        let source = r#"
+fara
+  naɗa result = 100 - 20 / 5 + 3 * 2
+ƙare
+"#;
+        let tokens = tokenize(source).expect("Failed to tokenize");
+        let program = parse(tokens).expect("Failed to parse");
+        let mut interpreter = Interpreter::new();
+        interpreter.execute(program).expect("Failed to execute");
+
+        let result = interpreter.get_variable("result").expect("Variable not found");
+        match result {
+            Value::Number(n) => assert_eq!(*n, 102), // 100 - 4 + 6 = 102
+            _ => panic!("Expected number"),
+        }
+    }
+
+    #[test]
+    fn test_execution_left_to_right_associativity() {
+        let source = r#"
+fara
+  naɗa result = 20 / 4 / 2
+ƙare
+"#;
+        let tokens = tokenize(source).expect("Failed to tokenize");
+        let program = parse(tokens).expect("Failed to parse");
+        let mut interpreter = Interpreter::new();
+        interpreter.execute(program).expect("Failed to execute");
+
+        let result = interpreter.get_variable("result").expect("Variable not found");
+        match result {
+            Value::Number(n) => assert_eq!(*n, 2), // (20 / 4) / 2 = 5 / 2 = 2, not 20 / (4 / 2) = 10
+            _ => panic!("Expected number"),
+        }
     }
 }
