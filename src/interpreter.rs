@@ -72,16 +72,34 @@ pub struct Interpreter {
     /// Stack de scopes pour les variables (0 = global, top = local)
     scope_stack: Vec<HashMap<String, Value>>,
     /// Fonctions définies par l'utilisateur
-    functions: HashMap<String, Function>,
+    pub functions: HashMap<String, Function>,
+    /// Control flow state for loops
+    loop_control: Option<LoopControl>,
+}
+
+/// État de contrôle pour les boucles
+#[derive(Debug, Clone)]
+enum LoopControl {
+    Break,
+    Continue,
 }
 
 impl Interpreter {
     /// Crée un nouveau interpréteur
     pub fn new() -> Self {
-        Interpreter {
+        let mut interpreter = Interpreter {
             scope_stack: vec![HashMap::new()], // Commence avec le scope global
             functions: HashMap::new(),
-        }
+            loop_control: None,
+        };
+        
+        // Register standard library functions
+        // TODO: Initialize stdlib when native function support is complete
+        // stdlib::register_stdlib(&mut interpreter).unwrap_or_else(|e| {
+        //     eprintln!("Warning: Failed to load stdlib: {}", e);
+        // });
+        
+        interpreter
     }
     
     /// Pousse un nouveau scope local
@@ -108,7 +126,7 @@ impl Interpreter {
     }
     
     /// Définit une variable dans le scope courant
-    fn set_variable_value(&mut self, name: String, value: Value) {
+    pub fn set_variable_value(&mut self, name: String, value: Value) {
         if let Some(current_scope) = self.scope_stack.last_mut() {
             current_scope.insert(name, value);
         }
@@ -188,6 +206,9 @@ impl Interpreter {
 
             Statement::While { condition, body } => {
                 loop {
+                    // Reset loop control at start of each iteration
+                    self.loop_control = None;
+                    
                     let condition_value = self.evaluate_expression(condition.clone())?;
 
                     // Évaluer la condition comme booléenne
@@ -208,9 +229,29 @@ impl Interpreter {
                         if let Some(return_value) = self.execute_statement(statement)? {
                             return Ok(Some(return_value));
                         }
+                        
+                        // Handle break/continue
+                        if let Some(control) = &self.loop_control {
+                            match control {
+                                LoopControl::Break => break, // Exit while loop
+                                LoopControl::Continue => break, // Continue to next iteration
+                            }
+                        }
+                    }
+                    
+                    // If continue was called, continue to next iteration
+                    if matches!(self.loop_control, Some(LoopControl::Continue)) {
+                        continue;
+                    }
+                    
+                    // If break was called, exit the loop
+                    if matches!(self.loop_control, Some(LoopControl::Break)) {
+                        break;
                     }
                 }
-
+                
+                // Clear loop control when exiting loop
+                self.loop_control = None;
                 Ok(None)
             }
 
@@ -220,12 +261,33 @@ impl Interpreter {
                 match iterable_value {
                     Value::List(elements) => {
                         for element in elements {
+                            // Reset loop control at start of each iteration
+                            self.loop_control = None;
+                            
                             self.set_variable_value(variable.clone(), element);
 
                             for statement in body.clone() {
                                 if let Some(return_value) = self.execute_statement(statement)? {
                                     return Ok(Some(return_value));
                                 }
+                                
+                                // Handle break/continue
+                                if let Some(control) = &self.loop_control {
+                                    match control {
+                                        LoopControl::Break => break, // Exit for loop
+                                        LoopControl::Continue => break, // Continue to next iteration
+                                    }
+                                }
+                            }
+                            
+                            // If continue was called, continue to next iteration
+                            if matches!(self.loop_control, Some(LoopControl::Continue)) {
+                                continue;
+                            }
+                            
+                            // If break was called, exit the loop
+                            if matches!(self.loop_control, Some(LoopControl::Break)) {
+                                break;
                             }
                         }
                     }
@@ -235,18 +297,20 @@ impl Interpreter {
                         ));
                     }
                 }
-
+                
+                // Clear loop control when exiting loop
+                self.loop_control = None;
                 Ok(None)
             }
 
             Statement::Break => {
-                // TODO: Implement break with control flow
-                Err(Error::runtime_error("katse ba a aiwatar ba tukuna (break not yet implemented)"))
+                self.loop_control = Some(LoopControl::Break);
+                Ok(None)
             }
 
             Statement::Continue => {
-                // TODO: Implement continue with control flow
-                Err(Error::runtime_error("ci_gaba ba a aiwatar ba tukuna (continue not yet implemented)"))
+                self.loop_control = Some(LoopControl::Continue);
+                Ok(None)
             }
         }
     }
