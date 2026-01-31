@@ -2,6 +2,182 @@ import init, { DabaraRuntime, version } from '../pkg/dabara.js';
 
 let runtime;
 
+// ── Dabara Syntax Highlighter ──────────────────────────────────
+
+const KEYWORDS = new Set([
+    'fara', 'ƙare', 'kare', 'rubuta', 'idan', 'amma', 'ammaina',
+    'maimaita', 'ga', 'cikin', 'katse', 'ci_gaba', 'aiki', 'mayar',
+]);
+
+const DECL_KEYWORDS = new Set(['var', 'naɗa', 'nada']);
+
+const BOOLEANS = new Set(['gaskiya', 'karya']);
+
+const BUILTINS = new Set(['karɓa']);
+
+// Tokenize source into spans with CSS classes
+function highlightCode(source) {
+    let result = '';
+    let i = 0;
+    const len = source.length;
+
+    while (i < len) {
+        const ch = source[i];
+
+        // Comment
+        if (ch === '#') {
+            let end = i;
+            while (end < len && source[end] !== '\n') end++;
+            result += span('comment', esc(source.slice(i, end)));
+            i = end;
+            continue;
+        }
+
+        // String
+        if (ch === '"') {
+            let end = i + 1;
+            while (end < len && source[end] !== '"') end++;
+            if (end < len) end++; // include closing quote
+            result += span('string', esc(source.slice(i, end)));
+            i = end;
+            continue;
+        }
+
+        // Number
+        if (isDigit(ch) || (ch === '.' && i + 1 < len && isDigit(source[i + 1]))) {
+            let end = i;
+            while (end < len && (isDigit(source[end]) || source[end] === '.')) end++;
+            result += span('number', esc(source.slice(i, end)));
+            i = end;
+            continue;
+        }
+
+        // Identifier / keyword
+        if (isIdentStart(ch)) {
+            let end = i;
+            while (end < len && isIdentChar(source[end])) end++;
+            const word = source.slice(i, end);
+
+            if (KEYWORDS.has(word)) {
+                result += span('keyword', word);
+            } else if (DECL_KEYWORDS.has(word)) {
+                result += span('variable', word);
+            } else if (BOOLEANS.has(word)) {
+                result += span('boolean', word);
+            } else if (BUILTINS.has(word)) {
+                result += span('builtin', word);
+            } else {
+                // Check if followed by ( → function call
+                let peek = end;
+                while (peek < len && source[peek] === ' ') peek++;
+                if (peek < len && source[peek] === '(') {
+                    result += span('function', word);
+                } else {
+                    result += esc(word);
+                }
+            }
+            i = end;
+            continue;
+        }
+
+        // Dot followed by identifier → method call
+        if (ch === '.') {
+            let end = i + 1;
+            if (end < len && isIdentStart(source[end])) {
+                let mEnd = end;
+                while (mEnd < len && isIdentChar(source[mEnd])) mEnd++;
+                result += span('operator', '.');
+                result += span('method', source.slice(end, mEnd));
+                i = mEnd;
+                continue;
+            }
+        }
+
+        // Operators
+        if ('+-*/'.includes(ch)) {
+            result += span('operator', esc(ch));
+            i++;
+            continue;
+        }
+
+        // Comparison operators (==, !=, <=, >=, <, >)
+        if (ch === '=' && i + 1 < len && source[i + 1] === '=') {
+            result += span('operator', '==');
+            i += 2;
+            continue;
+        }
+        if (ch === '!' && i + 1 < len && source[i + 1] === '=') {
+            result += span('operator', '!=');
+            i += 2;
+            continue;
+        }
+        if (ch === '<' && i + 1 < len && source[i + 1] === '=') {
+            result += span('operator', '&lt;=');
+            i += 2;
+            continue;
+        }
+        if (ch === '>' && i + 1 < len && source[i + 1] === '=') {
+            result += span('operator', '&gt;=');
+            i += 2;
+            continue;
+        }
+        if (ch === '<') {
+            result += span('operator', '&lt;');
+            i++;
+            continue;
+        }
+        if (ch === '>') {
+            result += span('operator', '&gt;');
+            i++;
+            continue;
+        }
+
+        // Assignment =
+        if (ch === '=') {
+            result += span('operator', '=');
+            i++;
+            continue;
+        }
+
+        // Brackets
+        if ('(){}[]'.includes(ch)) {
+            result += span('bracket', esc(ch));
+            i++;
+            continue;
+        }
+
+        // Default: whitespace, newlines, commas, etc.
+        result += esc(ch);
+        i++;
+    }
+
+    // Append a trailing newline so the pre height matches textarea
+    result += '\n';
+    return result;
+}
+
+function span(cls, content) {
+    return `<span class="syn-${cls}">${content}</span>`;
+}
+
+function esc(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function isDigit(c) {
+    return c >= '0' && c <= '9';
+}
+
+function isIdentStart(c) {
+    return /[a-zA-Z_ɓɗƙƴʔ]/.test(c);
+}
+
+function isIdentChar(c) {
+    return /[a-zA-Z0-9_ɓɗƙƴʔ]/.test(c);
+}
+
+// ── Example programs ───────────────────────────────────────────
+
 const EXAMPLES = {
     hello: `fara
   rubuta "Sannu, Duniya!"
@@ -91,8 +267,10 @@ const EXAMPLES = {
 ƙare`,
 };
 
-// DOM elements
+// ── DOM elements ───────────────────────────────────────────────
+
 const codeEditor = document.getElementById('code-editor');
+const highlightLayer = document.getElementById('highlight-layer');
 const outputEl = document.getElementById('output');
 const runBtn = document.getElementById('run-btn');
 const resetBtn = document.getElementById('reset-btn');
@@ -101,6 +279,19 @@ const examplesSelect = document.getElementById('examples-select');
 const errorBar = document.getElementById('error-bar');
 const lineInfo = document.getElementById('line-info');
 const versionBadge = document.getElementById('version-badge');
+
+// ── Highlighting sync ──────────────────────────────────────────
+
+function updateHighlight() {
+    highlightLayer.innerHTML = highlightCode(codeEditor.value);
+}
+
+function syncScroll() {
+    highlightLayer.scrollTop = codeEditor.scrollTop;
+    highlightLayer.scrollLeft = codeEditor.scrollLeft;
+}
+
+// ── Core functions ─────────────────────────────────────────────
 
 function showError(message) {
     errorBar.textContent = message;
@@ -141,6 +332,7 @@ function resetRuntime() {
 function loadExample(name) {
     if (EXAMPLES[name]) {
         codeEditor.value = EXAMPLES[name];
+        updateHighlight();
         resetRuntime();
     }
 }
@@ -160,8 +352,11 @@ function handleTab(e) {
         const end = codeEditor.selectionEnd;
         codeEditor.value = codeEditor.value.substring(0, start) + '  ' + codeEditor.value.substring(end);
         codeEditor.selectionStart = codeEditor.selectionEnd = start + 2;
+        updateHighlight();
     }
 }
+
+// ── Init ───────────────────────────────────────────────────────
 
 async function main() {
     try {
@@ -174,6 +369,9 @@ async function main() {
         } catch (_) {
             versionBadge.textContent = 'v0.2.0';
         }
+
+        // Initial highlight
+        updateHighlight();
 
         // Event listeners
         runBtn.addEventListener('click', runCode);
@@ -190,6 +388,13 @@ async function main() {
             }
         });
 
+        codeEditor.addEventListener('input', () => {
+            updateHighlight();
+            updateLineInfo();
+        });
+
+        codeEditor.addEventListener('scroll', syncScroll);
+
         codeEditor.addEventListener('keydown', (e) => {
             handleTab(e);
             // Ctrl+Enter / Cmd+Enter to run
@@ -199,7 +404,6 @@ async function main() {
             }
         });
 
-        codeEditor.addEventListener('input', updateLineInfo);
         codeEditor.addEventListener('click', updateLineInfo);
         codeEditor.addEventListener('keyup', updateLineInfo);
 
