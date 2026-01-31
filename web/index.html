@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ha" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dabara Playground - Hausa Programming Language</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Dabara <span class="version" id="version-badge"></span></h1>
+            <p class="subtitle">Harshen shirye-shirye na Hausa</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="toolbar">
+            <button id="run-btn" title="Gudanar (Ctrl+Enter)">
+                ▶ Gudanar
+            </button>
+            <button id="reset-btn" title="Sake saiti">
+                ↺ Sake saiti
+            </button>
+            <select id="examples-select">
+                <option value="">-- Zaɓi misali --</option>
+                <option value="hello">Sannu Duniya</option>
+                <option value="variables">Masu canjin</option>
+                <option value="conditions">Sharuɗɗa</option>
+                <option value="loops">Madaukai</option>
+                <option value="functions">Ayyuka</option>
+                <option value="lists">Jerin abu</option>
+                <option value="fibonacci">Fibonacci</option>
+            </select>
+        </div>
+
+        <div class="editor-output">
+            <div class="panel editor-panel">
+                <div class="panel-header">
+                    <span>Edita</span>
+                    <span class="line-info" id="line-info">Layi: 1</span>
+                </div>
+                <textarea id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+                    placeholder="Rubuta lambar Dabara a nan...">fara
+  var sunan = "Duniya"
+  rubuta "Sannu, " + sunan + "!"
+ƙare</textarea>
+            </div>
+
+            <div class="panel output-panel">
+                <div class="panel-header">
+                    <span>Fitarwa</span>
+                    <button id="clear-output" class="small-btn">Goge</button>
+                </div>
+                <pre id="output"></pre>
+            </div>
+        </div>
+
+        <div id="error-bar" class="error-bar hidden"></div>
+    </main>
+
+    <footer>
+        <p>Dabara &copy; 2026 Ibrahim Ahmad - Feyroozecode |
+            <a href="https://github.com/feyroozecode/dabara_lang" target="_blank">GitHub</a>
+        </p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

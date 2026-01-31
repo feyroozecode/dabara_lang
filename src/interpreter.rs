@@ -10,6 +10,9 @@ use std::io::{self, Write};
 use crate::parser::{Program, Statement, Expression, BinaryOperator, UnaryOperator};
 use crate::error::Error;
 
+#[cfg(feature = "serde")]
+use serde::Serialize;
+
 /// Représente une fonction définie par l'utilisateur
 #[derive(Debug, Clone)]
 pub struct Function {
@@ -19,6 +22,7 @@ pub struct Function {
 
 /// Types de valeurs dans Dabara
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum Value {
     /// Nombre entier
     Number(i64),
@@ -576,6 +580,139 @@ impl Interpreter {
     pub fn clear_variables(&mut self) {
         self.scope_stack.clear();
         self.scope_stack.push(HashMap::new()); // Recréer le scope global
+        self.functions.clear();
+    }
+
+    /// Exécute un programme avec capture de sortie (pour WASM)
+    pub fn execute_with_output(&mut self, program: Program, output: &mut String) -> Result<(), Error> {
+        for statement in program.statements {
+            if let Some(_) = self.execute_statement_with_output(statement, output)? {
+                // Retour au niveau global
+            }
+        }
+        Ok(())
+    }
+
+    /// Exécute un statement avec capture de sortie (pour WASM)
+    fn execute_statement_with_output(&mut self, statement: Statement, output: &mut String) -> Result<Option<Value>, Error> {
+        match statement {
+            Statement::Print(expression) => {
+                let value = self.evaluate_expression(expression)?;
+                output.push_str(&format!("{}\n", value));
+                Ok(None)
+            }
+
+            Statement::Let { name, value } => {
+                let evaluated_value = self.evaluate_expression(value)?;
+                self.set_variable_value(name, evaluated_value);
+                Ok(None)
+            }
+
+            Statement::FunctionDef { name, parameters, body } => {
+                let function = Function { parameters, body };
+                self.functions.insert(name, function);
+                Ok(None)
+            }
+
+            Statement::If { condition, then_branch, else_branch } => {
+                let condition_value = self.evaluate_expression(condition)?;
+                let is_true = match condition_value {
+                    Value::Boolean(b) => b,
+                    Value::Number(n) => n != 0,
+                    Value::Float(f) => f != 0.0 && !f.is_nan(),
+                    Value::String(s) => !s.is_empty(),
+                    Value::List(l) => !l.is_empty(),
+                };
+
+                if is_true {
+                    for statement in then_branch {
+                        if let Some(return_value) = self.execute_statement_with_output(statement, output)? {
+                            return Ok(Some(return_value));
+                        }
+                    }
+                } else if let Some(else_stmt) = else_branch {
+                    if let Some(return_value) = self.execute_statement_with_output(*else_stmt, output)? {
+                        return Ok(Some(return_value));
+                    }
+                }
+                Ok(None)
+            }
+
+            Statement::Return(expression) => {
+                let value = self.evaluate_expression(expression)?;
+                Ok(Some(value))
+            }
+
+            Statement::Expression(expression) => {
+                self.evaluate_expression(expression)?;
+                Ok(None)
+            }
+
+            Statement::While { condition, body } => {
+                loop {
+                    self.loop_control = None;
+                    let condition_value = self.evaluate_expression(condition.clone())?;
+                    let is_true = match condition_value {
+                        Value::Boolean(b) => b,
+                        Value::Number(n) => n != 0,
+                        Value::Float(f) => f != 0.0 && !f.is_nan(),
+                        Value::String(s) => !s.is_empty(),
+                        Value::List(l) => !l.is_empty(),
+                    };
+
+                    if !is_true { break; }
+
+                    for statement in body.clone() {
+                        if let Some(return_value) = self.execute_statement_with_output(statement, output)? {
+                            return Ok(Some(return_value));
+                        }
+                        if self.loop_control.is_some() { break; }
+                    }
+
+                    if matches!(self.loop_control, Some(LoopControl::Continue)) { continue; }
+                    if matches!(self.loop_control, Some(LoopControl::Break)) { break; }
+                }
+                self.loop_control = None;
+                Ok(None)
+            }
+
+            Statement::For { variable, iterable, body } => {
+                let iterable_value = self.evaluate_expression(iterable)?;
+                match iterable_value {
+                    Value::List(elements) => {
+                        for element in elements {
+                            self.loop_control = None;
+                            self.set_variable_value(variable.clone(), element);
+                            for statement in body.clone() {
+                                if let Some(return_value) = self.execute_statement_with_output(statement, output)? {
+                                    return Ok(Some(return_value));
+                                }
+                                if self.loop_control.is_some() { break; }
+                            }
+                            if matches!(self.loop_control, Some(LoopControl::Continue)) { continue; }
+                            if matches!(self.loop_control, Some(LoopControl::Break)) { break; }
+                        }
+                    }
+                    _ => {
+                        return Err(Error::runtime_error(
+                            "Don loop yana bukata jeri (For loop requires a list)"
+                        ));
+                    }
+                }
+                self.loop_control = None;
+                Ok(None)
+            }
+
+            Statement::Break => {
+                self.loop_control = Some(LoopControl::Break);
+                Ok(None)
+            }
+
+            Statement::Continue => {
+                self.loop_control = Some(LoopControl::Continue);
+                Ok(None)
+            }
+        }
     }
     
     /// Appelle une fonction définie par l'utilisateur

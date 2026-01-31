@@ -5,8 +5,12 @@
 
 use crate::error::Error;
 
+#[cfg(feature = "serde")]
+use serde::Serialize;
+
 /// Types de tokens dans Dabara
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum Token {
     // Mots-clés Hausa
     Begin,      // fara

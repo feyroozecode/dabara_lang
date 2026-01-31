@@ -6,14 +6,19 @@
 use crate::lexer::Token;
 use crate::error::Error;
 
+#[cfg(feature = "serde")]
+use serde::Serialize;
+
 /// Représente un programme Dabara complet
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Program {
     pub statements: Vec<Statement>,
 }
 
 /// Types de statements dans Dabara
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum Statement {
     /// Déclaration de variable: naɗa nom = expression    
     Let { name: String, value: Expression },
@@ -54,6 +59,7 @@ pub enum Statement {
 
 /// Types d'expressions dans Dabara
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum Expression {
     /// Identificateur de variable
     Identifier(String),
@@ -100,6 +106,7 @@ pub enum Expression {
 
 /// Opérateurs unaires supportés
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum UnaryOperator {
     /// Négation (-)
     Negate,
@@ -109,6 +116,7 @@ pub enum UnaryOperator {
 
 /// Opérateurs binaires supportés
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum BinaryOperator {
     /// Addition (+)
     Add,
